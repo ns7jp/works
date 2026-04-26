@@ -1,0 +1,37 @@
+# SQLite database (contains user data, not committed)
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets
+.env
+.env.local
+config/secrets.php
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dependency directories (if Composer is added later)
+vendor/
+composer.lock
+
+# PHP runtime files
+*.cache
+.phpunit.result.cache

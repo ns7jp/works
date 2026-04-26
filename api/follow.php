@@ -1,0 +1,58 @@
+<?php
+session_start();
+require_once __DIR__ . '/../includes/functions.php';
+
+header('Content-Type: application/json');
+
+if (!isLoggedIn()) {
+    http_response_code(401);
+    echo json_encode(['error' => '認証が必要です']);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => '不正なメソッドです']);
+    exit;
+}
+
+$pdo = getDB();
+$data = json_decode(file_get_contents('php://input'), true);
+$targetId = (int)($data['user_id'] ?? 0);
+$userId = $_SESSION['user_id'];
+
+if ($targetId <= 0 || $targetId === $userId) {
+    http_response_code(400);
+    echo json_encode(['error' => '不正なリクエストです']);
+    exit;
+}
+
+// ユーザー存在確認
+$stmt = $pdo->prepare('SELECT id FROM users WHERE id = ?');
+$stmt->execute([$targetId]);
+if (!$stmt->fetch()) {
+    http_response_code(404);
+    echo json_encode(['error' => 'ユーザーが見つかりません']);
+    exit;
+}
+
+// フォロートグル
+$isFollowing = isFollowing($pdo, $userId, $targetId);
+
+if ($isFollowing) {
+    $stmt = $pdo->prepare('DELETE FROM follows WHERE follower_id = ? AND following_id = ?');
+    $stmt->execute([$userId, $targetId]);
+    $following = false;
+} else {
+    $stmt = $pdo->prepare('INSERT INTO follows (follower_id, following_id, created_at) VALUES (?, ?, ?)');
+    $stmt->execute([$userId, $targetId, nowJST()]);
+    $following = true;
+}
+
+$followerCount = getFollowerCount($pdo, $targetId);
+
+echo json_encode([
+    'success'        => true,
+    'following'       => $following,
+    'follower_count' => $followerCount,
+]);
