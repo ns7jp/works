@@ -4,7 +4,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-777BB4?logo=php&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
@@ -17,15 +17,15 @@
 
 | # | 作品名 | 技術スタック | ライブデモ | ソースコード |
 |---|-------|-----------|---------|----------|
-| ① | SNSアプリ「Pulse」 | PHP / MySQL / JavaScript | [▶ Demo](http://shimada.atwebpages.com/pulse/) | （公開予定） |
-| ② | 掲示板アプリ | PHP / MySQL | [▶ Demo](http://shimada.atwebpages.com/post/) | （公開予定） |
+| ① | SNSアプリ「Pulse」 | PHP / SQLite / JavaScript | [▶ Demo](http://shimada.atwebpages.com/pulse/) | [ns7jp/pulse](https://github.com/ns7jp/pulse)（公開予定） |
+| ② | 掲示板アプリ | PHP / SQLite | [▶ Demo](http://shimada.atwebpages.com/post/) | （公開予定） |
 | ③ | 定型文管理アプリ | Python / Flet | デスクトップ | [teikei_kanri.py](./teikei_kanri.py) |
 | ④ | 付箋アプリ | Python / tkinter | デスクトップ | [sticky_notes.py](./sticky_notes.py) |
 | ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](http://shimada.atwebpages.com/magic/) | （公開予定） |
 
 ---
 
-## ① SNSアプリ「Pulse」 — 感情共鳴型SNS
+## ① SNSアプリ「Pulse」 — 感情共鳴型SNS（PHP / SQLite / JavaScript）
 
 [![View Demo](https://img.shields.io/badge/▶_View_Live_Demo-blue)](http://shimada.atwebpages.com/pulse/)
 
@@ -51,11 +51,12 @@
 | XSS対策 | `htmlspecialchars()` による出力エスケープ |
 | CSRF対策 | トークン方式（フォームに `csrf_token` を埋め込み検証） |
 | セッション管理 | PHP セッションでログイン状態を保持 |
-| パスワード | ハッシュ化保存 |
+| パスワード | bcrypt ハッシュ化（`password_hash()` / `password_verify()`） |
+| タイミング攻撃対策 | `hash_equals()` による定数時間比較 |
 
 ---
 
-## ② 掲示板アプリ
+## ② 掲示板アプリ（PHP / SQLite）
 
 [![View Demo](https://img.shields.io/badge/▶_View_Live_Demo-blue)](http://shimada.atwebpages.com/post/)
 
