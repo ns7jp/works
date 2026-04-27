@@ -17,8 +17,8 @@
 
 | # | 作品名 | 技術スタック | ライブデモ | ソースコード |
 |---|-------|-----------|---------|----------|
-| ① | SNSアプリ「Pulse」 | PHP / SQLite / JavaScript | [▶ Demo](http://shimada.atwebpages.com/pulse/) | [ns7jp/pulse](https://github.com/ns7jp/pulse)（公開予定） |
-| ② | 掲示板アプリ | PHP / SQLite | [▶ Demo](http://shimada.atwebpages.com/post/) | （公開予定） |
+| ① | SNSアプリ「Pulse」 | PHP / SQLite / JavaScript | [▶ Demo](http://shimada.atwebpages.com/pulse/) | [ns7jp/pulse](https://github.com/ns7jp/pulse) |
+| ② | 掲示板アプリ | PHP / MySQL | [▶ Demo](http://shimada.atwebpages.com/post/) | [ns7jp/post](https://github.com/ns7jp/post) |
 | ③ | 定型文管理アプリ | Python / Flet | デスクトップ | [teikei_kanri.py](./teikei_kanri.py) |
 | ④ | 付箋アプリ | Python / tkinter | デスクトップ | [sticky_notes.py](./sticky_notes.py) |
 | ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](http://shimada.atwebpages.com/magic/) | （公開予定） |
