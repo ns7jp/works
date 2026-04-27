@@ -22,8 +22,7 @@
 | ② | 掲示板アプリ | PHP / MySQL | [▶ Demo](http://shimada.atwebpages.com/post/) | [ns7jp/post](https://github.com/ns7jp/post) |
 | ③ | 定型文管理アプリ | Python / Flet | デスクトップ | [teikei_kanri.py](./teikei_kanri.py) |
 | ④ | 付箋アプリ | Python / tkinter | デスクトップ | [sticky_notes.py](./sticky_notes.py) |
-| ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](http://shimada.atwebpages.com/magic/) | （公開予定） |
-
+| ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](https://ns7jp.github.io/magic/) | [ns7jp/magic]
 ---
 
 ## ① SNSアプリ「Pulse」 — 感情共鳴型SNS（PHP / SQLite / JavaScript）
@@ -122,7 +121,7 @@ python sticky_notes.py
 
 ## ⑤ サンプル企業サイト（HTML / CSS / JavaScript / jQuery）
 
-[![View Demo](https://img.shields.io/badge/▶_View_Live_Demo-blue)](http://shimada.atwebpages.com/magic/)
+[![View Demo](https://img.shields.io/badge/▶_View_Live_Demo-blue)](https://ns7jp.github.io/magic/)
 
 レスポンシブ対応のコーポレートサイト。コーディング課題として作成。
 
@@ -148,7 +147,7 @@ python sticky_notes.py
   - Python3エンジニア認定実践試験
   - PHP8技術者認定初級試験
   - 食品衛生管理者
-- 🌐 [ポートフォリオサイト](http://shimada.atwebpages.com/pf/)
+- 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
 - 📧 net7jp@gmail.com
 
 ---
