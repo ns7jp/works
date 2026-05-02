@@ -10,7 +10,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
 
-🌐 **ポートフォリオサイト**: http://shimada.atwebpages.com/pf/
+🌐 **ポートフォリオサイト**: https://ns7jp.github.io/
 
 ---
 
@@ -18,11 +18,11 @@
 
 | # | 作品名 | 技術スタック | ライブデモ | ソースコード |
 |---|-------|-----------|---------|----------|
-| ① | SNSアプリ「Pulse」 | PHP / SQLite / JavaScript | [▶ Demo](http://shimada.atwebpages.com/pulse/) | [ns7jp/pulse](https://github.com/ns7jp/pulse)（公開予定） |
-| ② | 掲示板アプリ | PHP / MySQL | [▶ Demo](http://shimada.atwebpages.com/post/) | [ns7jp/post](https://github.com/ns7jp/post)（公開予定） |
+| ① | SNSアプリ「Pulse」 | PHP / SQLite / JavaScript | [▶ Demo](http://shimada.atwebpages.com/pulse/) | [ns7jp/pulse](https://github.com/ns7jp/pulse) |
+| ② | 掲示板アプリ | PHP / MySQL | [▶ Demo](http://shimada.atwebpages.com/post/) | [ns7jp/post](https://github.com/ns7jp/post)|
 | ③ | 定型文管理アプリ | Python / Flet | デスクトップ | [teikei_kanri.py](./teikei_kanri.py) |
 | ④ | 付箋アプリ | Python / tkinter | デスクトップ | [sticky_notes.py](./sticky_notes.py) |
-| ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](http://shimada.atwebpages.com/magic/) | （公開予定） |
+| ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](https://ns7jp.github.io/magic/) |
 
 ---
 
@@ -245,7 +245,7 @@ python sticky_notes.py
   - Python3エンジニア認定実践試験
   - PHP8技術者認定初級試験
   - 食品衛生管理者
-- 🌐 [ポートフォリオサイト](http://shimada.atwebpages.com/pf/)
+- 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
 - 📧 net7jp@gmail.com
 
 ---
