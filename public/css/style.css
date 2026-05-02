@@ -1,26 +1,59 @@
-/* ============================================
+/* ============================================================
    Pulse - 感情共鳴型SNS
    ダークテーマ + ネオンアクセント
-   ============================================ */
+   ============================================================
+   このスタイルシートは以下の構成で書かれています:
+     1. 基本変数（カラー・角丸・影）の定義（:root）
+     2. リセット & 全体ベース
+     3. ナビバー / アバター / コンテナ
+     4. ボタン / フォーム / アラート
+     5. 認証ページ
+     6. タイムライン / サイドバー / 投稿カード / 共鳴
+     7. 返信機能
+     8. 投稿フォーム / オプション
+     9. プロフィール / 感情オーラ / ユーザーリスト
+    10. 空状態 / フッター / アニメーション / スクロールバー
+   ============================================================ */
 
+/* ----------------------------------------------------------
+   :root に CSS カスタムプロパティ（変数）を定義する。
+   var(--bg-primary) のように使い回すことで、
+   テーマカラー変更時に1か所だけ修正すれば済む。
+   ---------------------------------------------------------- */
 :root {
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #12121a;
-    --bg-card: #1a1a2e;
-    --bg-input: #16162a;
-    --text-primary: #e4e4e7;
+    /* 背景色（暗 → 明 の階層） */
+    --bg-primary:   #0a0a0f;   /* ページ全体のベース背景 */
+    --bg-secondary: #12121a;   /* ナビバー・少し明るい領域 */
+    --bg-card:      #1a1a2e;   /* カード（投稿・プロフィール等） */
+    --bg-input:     #16162a;   /* 入力欄の背景 */
+
+    /* テキスト色（明 → 暗 の階層） */
+    --text-primary:   #e4e4e7;
     --text-secondary: #a1a1aa;
-    --text-muted: #71717a;
-    --border: #27273a;
-    --accent: #6366f1;
-    --accent-glow: rgba(99, 102, 241, 0.3);
+    --text-muted:     #71717a;
+
+    /* 枠線・アクセント（ネオン感のあるパープル） */
+    --border:      #27273a;
+    --accent:      #6366f1;
+    --accent-glow: rgba(99, 102, 241, 0.3);  /* グロー（光彩）用の半透明色 */
+
+    /* ステータスカラー */
     --success: #22c55e;
-    --error: #ef4444;
-    --radius: 12px;
-    --radius-sm: 8px;
+    --error:   #ef4444;
+
+    /* 角丸 */
+    --radius:    12px;   /* 標準 */
+    --radius-sm: 8px;    /* 小さめ */
+
+    /* 影 */
     --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
+/* ----------------------------------------------------------
+   全要素リセット
+     box-sizing: border-box → padding/border を width に含める
+     （計算が直感的になり、レイアウト崩れを防ぐ）
+   ---------------------------------------------------------- */
 * {
     margin: 0;
     padding: 0;
@@ -42,7 +75,12 @@ a {
 }
 a:hover { opacity: 0.8; }
 
-/* ============ ナビバー ============ */
+/* ============================================================
+   ナビバー
+     position: sticky → スクロール時も画面上部に貼り付く
+     z-index: 100    → 他の要素より前面に表示
+     backdrop-filter: blur(12px) → 背景をぼかす（ガラス風）
+   ============================================================ */
 .navbar {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
@@ -74,12 +112,18 @@ a:hover { opacity: 0.8; }
 .logo-icon {
     color: var(--accent);
     font-size: 1.6rem;
+    /* ロゴアイコンを「拍動するように光らせる」アニメーション */
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
+/* ----------------------------------------------------------
+   @keyframes pulse-glow
+     光彩を弱→強→弱と変化させて拍動感を出す。
+     アプリ名「Pulse」を象徴するキーアニメーション。
+   ---------------------------------------------------------- */
 @keyframes pulse-glow {
     0%, 100% { text-shadow: 0 0 8px var(--accent-glow); }
-    50% { text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent-glow); }
+    50%      { text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent-glow); }
 }
 
 .pulse-animate {
@@ -109,7 +153,11 @@ a:hover { opacity: 0.8; }
     background: var(--accent-glow);
 }
 
-/* ============ アバター ============ */
+/* ============================================================
+   アバター（円形のユーザーアイコン）
+     border-radius: 50% で正円に
+     表示名の頭文字1文字を中央配置
+   ============================================================ */
 .avatar-sm {
     width: 32px;
     height: 32px;
@@ -129,14 +177,21 @@ a:hover { opacity: 0.8; }
     color: var(--text-muted) !important;
 }
 
-/* ============ コンテナ ============ */
+/* ============================================================
+   コンテナ（中央寄せの最大幅レイアウト）
+     margin: 0 auto で左右中央揃え
+   ============================================================ */
 .container {
     max-width: 1100px;
     margin: 0 auto;
     padding: 24px 20px;
 }
 
-/* ============ ボタン ============ */
+/* ============================================================
+   ボタン
+     共通の .btn と、用途別の .btn-primary / .btn-outline / .btn-glow など
+     transition: ホバー時のアニメーションを滑らかにする
+   ============================================================ */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -177,14 +232,16 @@ a:hover { opacity: 0.8; }
     box-shadow: 0 0 12px var(--accent-glow);
 }
 
+/* 拍動エフェクト付きボタン:
+   ::after 疑似要素で円形グラデの光を重ね、ホバーでフェードイン */
 .btn-pulse {
     position: relative;
     overflow: hidden;
 }
 .btn-pulse::after {
-    content: '';
+    content: '';                /* 疑似要素には content が必須 */
     position: absolute;
-    inset: 0;
+    inset: 0;                   /* top:0; right:0; bottom:0; left:0 の省略形 */
     background: radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 70%);
     opacity: 0;
     transition: opacity 0.3s;
@@ -196,7 +253,10 @@ a:hover { opacity: 0.8; }
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* ============ フォーム ============ */
+/* ============================================================
+   フォーム（input, textarea, select の共通スタイル）
+     focus 時にアクセントカラーのグロー（光彩）で視覚的フィードバック
+   ============================================================ */
 .form-group {
     margin-bottom: 16px;
 }
@@ -245,7 +305,10 @@ textarea { resize: vertical; font-family: inherit; }
     margin-top: 4px;
 }
 
-/* ============ アラート ============ */
+/* ============================================================
+   アラート（エラー/成功メッセージ）
+     色は :root のカラーパレットに合わせ、半透明の背景＋枠線で柔らかく
+   ============================================================ */
 .alert {
     padding: 12px 16px;
     border-radius: var(--radius-sm);
@@ -266,7 +329,9 @@ textarea { resize: vertical; font-family: inherit; }
     gap: 12px;
 }
 
-/* ============ 認証ページ ============ */
+/* ============================================================
+   認証ページ（login.php / register.php）の中央寄せカード
+   ============================================================ */
 .auth-container {
     display: flex;
     align-items: center;
@@ -310,19 +375,25 @@ textarea { resize: vertical; font-family: inherit; }
     color: var(--text-muted);
 }
 
-/* ============ タイムライン ============ */
+/* ============================================================
+   タイムライン2カラムレイアウト
+     左 300px = サイドバー / 右 = 投稿一覧
+     CSS Grid で組む。tablet 以下では1カラムに切替。
+   ============================================================ */
 .timeline-layout {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 300px 1fr;   /* 1fr = 残り幅をすべて使う */
     gap: 24px;
     align-items: start;
 }
 
+/* メディアクエリ: 画面幅が 768px 以下のときのスタイル（スマホ向け） */
 @media (max-width: 768px) {
     .timeline-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr;     /* 1カラム化 */
     }
-    .sidebar { order: 2; }
+    /* スマホではタイムライン → サイドバーの順に並べる */
+    .sidebar  { order: 2; }
     .timeline { order: 1; }
 }
 
@@ -333,7 +404,10 @@ textarea { resize: vertical; font-family: inherit; }
     border-bottom: 1px solid var(--border);
 }
 
-/* ============ サイドバー ============ */
+/* ============================================================
+   サイドバー（感情天気予報・ムードフィルター）
+     position: sticky でスクロール時も画面に追従（top: 84px = ナビバー分の余白）
+   ============================================================ */
 .sidebar {
     position: sticky;
     top: 84px;
@@ -384,7 +458,9 @@ textarea { resize: vertical; font-family: inherit; }
 .weather-bar {
     height: 100%;
     border-radius: 4px;
+    /* width 変化を 0.6 秒かけてアニメーション → 棒が伸びる演出 */
     transition: width 0.6s ease;
+    /* currentColor: 現在の color プロパティの値を再利用 → ムード色のグロー */
     box-shadow: 0 0 8px currentColor;
 }
 .weather-percent {
@@ -420,10 +496,15 @@ textarea { resize: vertical; font-family: inherit; }
     background: var(--mood-color, var(--accent));
     color: white;
     border-color: transparent;
+    /* color-mix(): 2 つの色を混ぜる関数（モダン CSS）。ここでは40%のムード色＋透明 → グロー色を動的に作成 */
     box-shadow: 0 0 12px color-mix(in srgb, var(--mood-color, var(--accent)) 40%, transparent);
 }
 
-/* ============ 投稿カード ============ */
+/* ============================================================
+   投稿カード
+     左側に「ムード色のボーダー」を 3px 表示する → 一目で感情がわかる
+     position: relative + overflow: hidden で .post-ripple を内部に閉じ込める
+   ============================================================ */
 .post-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -433,6 +514,7 @@ textarea { resize: vertical; font-family: inherit; }
     position: relative;
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
+    /* HTML 側の style="--mood-color:..." で投稿ごとに色が変わる */
     border-left: 3px solid var(--mood-color, var(--accent));
 }
 .post-card:hover {
@@ -441,6 +523,8 @@ textarea { resize: vertical; font-family: inherit; }
                 0 0 16px color-mix(in srgb, var(--mood-color) 15%, transparent);
 }
 
+/* 静的な装飾用の波紋
+   （JS が共鳴時に挿入する波紋とは別。カード右上にぼんやり光るムード色） */
 .post-ripple {
     position: absolute;
     top: -50%;
@@ -449,7 +533,7 @@ textarea { resize: vertical; font-family: inherit; }
     height: 200px;
     border-radius: 50%;
     background: radial-gradient(circle, color-mix(in srgb, var(--mood-color) 8%, transparent), transparent 70%);
-    pointer-events: none;
+    pointer-events: none;     /* マウスイベントを透過 → 下のボタンを邪魔しない */
 }
 
 .post-header {
@@ -554,13 +638,18 @@ textarea { resize: vertical; font-family: inherit; }
     animation: resonate-pulse 0.4s ease;
 }
 
+/* 共鳴ボタンのアイコンが「拍動して大きくなる」アニメーション */
 @keyframes resonate-pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.5); }
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.5); }
     100% { transform: scale(1.2); }
 }
 
-/* ============ 返信 ============ */
+/* ============================================================
+   返信機能（返信ボタン・返信フォーム・返信カード）
+     fadeInUp アニメーションでなめらかに出現
+     replies-wrap は左に縦線（ボーダー）を引いてスレッド感を演出
+   ============================================================ */
 .reply-toggle-btn, .reply-show-btn {
     display: flex;
     align-items: center;
@@ -728,7 +817,10 @@ textarea { resize: vertical; font-family: inherit; }
     font-size: 0.9rem;
 }
 
-/* ============ 投稿フォーム ============ */
+/* ============================================================
+   投稿フォーム（post.php）
+     mood-selector を CSS Grid で 4 列に配置（スマホでは 2 列）
+   ============================================================ */
 .post-page {
     max-width: 600px;
     margin: 0 auto;
@@ -764,6 +856,8 @@ textarea { resize: vertical; font-family: inherit; }
 .mood-option {
     cursor: pointer;
 }
+/* ラジオボタン本体は非表示にして、ラベル全体をクリック可能にする
+   （:checked は隠れていても CSS セレクタで判定できる） */
 .mood-option input { display: none; }
 
 .mood-option-inner {
@@ -781,6 +875,9 @@ textarea { resize: vertical; font-family: inherit; }
     border-color: var(--mood-color);
     background: color-mix(in srgb, var(--mood-color) 8%, transparent);
 }
+/* 隣接セレクタ "input:checked + .mood-option-inner":
+   選択中のラジオボタンの直後にある .mood-option-inner だけスタイル変更
+   → ムードを選んだものだけ枠が光る */
 .mood-option input:checked + .mood-option-inner {
     border-color: var(--mood-color);
     background: color-mix(in srgb, var(--mood-color) 15%, transparent);
@@ -790,7 +887,10 @@ textarea { resize: vertical; font-family: inherit; }
 .mood-emoji { font-size: 1.6rem; }
 .mood-label { font-size: 0.8rem; color: var(--text-secondary); }
 
-/* ============ 投稿オプション ============ */
+/* ============================================================
+   投稿オプション（ささやきモード / タイムカプセル）
+     チェックボックスをトグル風の見た目に
+   ============================================================ */
 .post-options {
     margin: 16px 0;
     display: flex;
@@ -837,7 +937,11 @@ textarea { resize: vertical; font-family: inherit; }
     margin-top: -4px;
 }
 
-/* ============ プロフィール ============ */
+/* ============================================================
+   プロフィールページ
+     ヘッダー（アバター＋名前＋フォローボタン）
+     感情オーラ / 統計タブ / ユーザーリスト
+   ============================================================ */
 .profile-page {
     max-width: 700px;
     margin: 0 auto;
@@ -884,7 +988,11 @@ textarea { resize: vertical; font-family: inherit; }
     align-self: flex-start;
 }
 
-/* 感情オーラ */
+/* ----------------------------------------------------------
+   感情オーラ
+     直近7日間のムード上位3つを「浮遊する球体」で可視化。
+     aura-float アニメーションで上下にゆらゆら動く。
+   ---------------------------------------------------------- */
 .aura-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -924,16 +1032,19 @@ textarea { resize: vertical; font-family: inherit; }
     gap: 8px;
     animation: aura-float 3s ease-in-out infinite;
 }
+/* 各オーブのアニメーション開始時刻をずらして、ばらばらに浮遊させる */
 .aura-orb:nth-child(2) { animation-delay: 0.5s; }
 .aura-orb:nth-child(3) { animation-delay: 1s; }
 
+/* 上下に 8px ふわふわ移動するアニメーション */
 @keyframes aura-float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50%      { transform: translateY(-8px); }
 }
 
 .aura-emoji {
     font-size: 2.2rem;
+    /* drop-shadow: 絵文字の輪郭にムード色のグロー（光彩）を付ける */
     filter: drop-shadow(0 0 12px var(--aura-color));
 }
 .aura-mood-label {
@@ -942,7 +1053,10 @@ textarea { resize: vertical; font-family: inherit; }
     font-weight: 600;
 }
 
-/* 統計タブ */
+/* ----------------------------------------------------------
+   統計タブ（パルス数 / フォロワー / フォロー中）
+     クリックでタブ切り替え。stat-active で現在タブをハイライト。
+   ---------------------------------------------------------- */
 .profile-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -991,7 +1105,9 @@ textarea { resize: vertical; font-family: inherit; }
     border-bottom: 1px solid var(--border);
 }
 
-/* ユーザーリスト */
+/* ----------------------------------------------------------
+   ユーザーリスト（フォロワー / フォロー中タブで表示）
+   ---------------------------------------------------------- */
 .user-list {
     display: flex;
     flex-direction: column;
@@ -1075,7 +1191,9 @@ textarea { resize: vertical; font-family: inherit; }
     flex-shrink: 0;
 }
 
-/* ============ 空状態 ============ */
+/* ============================================================
+   空状態（投稿が0件・フォロワーが0人 等の時の表示）
+   ============================================================ */
 .empty-state {
     text-align: center;
     padding: 48px 20px;
@@ -1088,7 +1206,9 @@ textarea { resize: vertical; font-family: inherit; }
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* ============ フッター ============ */
+/* ============================================================
+   フッター
+   ============================================================ */
 .footer {
     text-align: center;
     padding: 24px 20px;
@@ -1098,7 +1218,10 @@ textarea { resize: vertical; font-family: inherit; }
     margin-top: 40px;
 }
 
-/* ============ アニメーション（エントリ） ============ */
+/* ============================================================
+   エントリーアニメーション（投稿カードの登場演出）
+     下から 16px の位置でフェードイン
+   ============================================================ */
 .post-card {
     animation: fadeInUp 0.4s ease;
 }
@@ -1113,13 +1236,18 @@ textarea { resize: vertical; font-family: inherit; }
     }
 }
 
-/* delay for staggered animation */
+/* 上位5件の投稿カードを少しずつ遅延させて、波打つように出現させる
+   （nth-child(n) は親要素の n 番目の子要素にマッチ） */
 .post-card:nth-child(2) { animation-delay: 0.05s; }
-.post-card:nth-child(3) { animation-delay: 0.1s; }
+.post-card:nth-child(3) { animation-delay: 0.10s; }
 .post-card:nth-child(4) { animation-delay: 0.15s; }
-.post-card:nth-child(5) { animation-delay: 0.2s; }
+.post-card:nth-child(5) { animation-delay: 0.20s; }
 
-/* ============ スクロールバー ============ */
+/* ============================================================
+   スクロールバーのカスタマイズ（WebKit 系ブラウザ専用）
+     Chrome / Safari / Edge では細く目立たないバーになる
+     Firefox では効かない（CSS 標準の scrollbar-* は別途必要）
+   ============================================================ */
 ::-webkit-scrollbar {
     width: 6px;
 }
