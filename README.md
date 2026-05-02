@@ -13,7 +13,7 @@ Pulse は、感情をベースにしたまったく新しいソーシャルネ�
 
 🔗 **ライブデモ**: http://shimada.atwebpages.com/pulse/
 
-> ⚠️ **デモサイトは無料ホスティング（HTTP）で運用しています。** 学習目的のため、本番運用はしていません。実際のログイン情報は使用しないでください。
+> ⚠️ **デモサイトは無料ホスティング（HTTP）で運用しています。** 学習目的のため、本番運用はしていません。実際のログイン情報は使用しないでください（テストアカウントで動作確認できます）。
 
 ---
 
@@ -74,6 +74,48 @@ Pulse では、投稿のたびに 8 種類の感情ムードから「今の気�
 
 ---
 
+## ディレクトリ構成
+
+```
+SNSアプリ/
+├── config/
+│   └── database.php        ... DB 設定・スキーマ・マイグレーション
+├── includes/
+│   ├── functions.php        ... 共通関数・ムード定義
+│   ├── header.php           ... ナビゲーションバー
+│   └── footer.php           ... フッター
+├── api/
+│   ├── resonate.php         ... 共鳴 API（Ajax）
+│   ├── follow.php           ... フォロー API（Ajax）
+│   └── reply.php            ... 返信 API（Ajax）
+├── public/
+│   ├── css/style.css        ... ダーク + ネオン UI
+│   └── js/app.js            ... クライアント JS
+├── index.php                ... タイムライン
+├── post.php                 ... 投稿ページ
+├── profile.php              ... プロフィール（タブ式）
+├── login.php                ... ログイン
+├── register.php             ... 新規登録
+└── logout.php               ... ログアウト
+```
+
+---
+
+## 起動方法
+
+```bash
+git clone https://github.com/ns7jp/pulse.git
+cd pulse
+php -S localhost:8000
+```
+
+ブラウザで `http://localhost:8000` を開き、新規登録するとすぐに利用開始できます。
+データベースは初回アクセス時に自動で作成されます（外部 DB 不要）。
+
+**動作要件**: PHP 8.x 以上（PDO SQLite 拡張モジュールが有効であること）
+
+---
+
 ## セキュリティ実装
 
 学習目的の作品ですが、Web アプリケーションのセキュリティ基礎を意識して実装しています。
@@ -85,112 +127,8 @@ Pulse では、投稿のたびに 8 種類の感情ムードから「今の気�
 | **CSRF（クロスサイトリクエスト偽造）** | `random_bytes(32)` でトークン生成、フォームに埋め込み、`hash_equals()` で**タイミング攻撃対策**込みで検証 | `includes/functions.php` |
 | **パスワード保護** | `password_hash()`（bcrypt）でハッシュ化保存、`password_verify()` で検証 | `register.php`, `login.php` |
 | **セッション管理** | PHP セッションで認証状態を保持。未ログイン時は自動的にログイン画面へリダイレクト | `includes/functions.php` |
+| **権限チェック** | 投稿の編集・削除時にユーザー ID を検証 | 各 API |
 | **エラーハンドリング** | `PDO::ATTR_ERRMODE` を `EXCEPTION` に設定し、エラー時は安全に処理 | `config/database.php` |
-
----
-
-## 🚀 セットアップ
-
-Pulse は **SQLite** を使うので、**外部DB の作成・設定が不要**です。
-PHP さえインストールされていれば、すぐに動かせます。
-
-### 必要なソフトウェア
-
-PHP 8.x 以上が動く環境が必要です。以下のいずれかを用意してください：
-
-| 環境 | 入手先 | 推奨度 |
-|------|------|------|
-| **XAMPP**（PHP同梱） | https://www.apachefriends.org | 初心者におすすめ |
-| **PHP単体**（ビルトインサーバー） | https://www.php.net/downloads | 最小構成 |
-
----
-
-### 方法A：XAMPP を使う場合
-
-#### Step 1: ソースコードをダウンロード
-このリポジトリの右上の緑色 **「Code」** ボタン → **「Download ZIP」**  
-ZIPを解凍すると `pulse` フォルダ（または `SNSアプリ` フォルダ）ができます。
-
-#### Step 2: htdocs に配置
-解凍したフォルダを XAMPP の **htdocs** に移動：
-```
-C:\xampp\htdocs\pulse\
-```
-中に `login.php` `index.php` などが並んでいる状態にしてください。
-
-#### Step 3: XAMPP を起動
-1. **XAMPP Control Panel** を起動
-2. **Apache** の「Start」ボタンをクリック（緑色になればOK）
-3. （MySQL は不要、起動しなくてOK）
-
-#### Step 4: ブラウザでアクセス
-**http://localhost/pulse/login.php** を開く
-
-→ 新規登録 → ログイン → 投稿してみる 🎉
-
-> 💡 データベース（`data/pulse.db`）は**初回アクセス時に自動で作成**されます。SQL を実行する必要はありません。
-
----
-
-### 方法B：PHP ビルトインサーバーを使う場合（XAMPP不要）
-
-#### Step 1: ソースコードをダウンロード
-ZIP ダウンロードまたは：
-```bash
-git clone https://github.com/ns7jp/pulse.git
-cd pulse
-```
-
-#### Step 2: PHP サーバーを起動
-コマンドプロンプト（または PowerShell / ターミナル）で：
-```bash
-php -S localhost:8000
-```
-
-#### Step 3: ブラウザでアクセス
-**http://localhost:8000** を開く
-
-これだけです。データベースは自動作成されます。
-
----
-
-## ❓ つまずきポイント
-
-| 症状 | 対処法 |
-|------|------|
-| Apacheが起動しない | ポート80が他のソフト（Skype等）に使われている可能性。XAMPPのconfigでポート変更 |
-| `php` コマンドが認識されない | PHP の PATH が通っていない。XAMPP使用なら `C:\xampp\php` を環境変数 PATH に追加 |
-| 「Could not open database」エラー | `data/` フォルダの**書き込み権限**を確認（特に Linux/Mac） |
-| 画面真っ白 | PHPのエラー表示を有効にして詳細確認：`php -d display_errors=1 -S localhost:8000` |
-
----
-
-## ディレクトリ構成
-
-```
-pulse/
-├── config/
-│   └── database.php        ... DB 設定・スキーマ・マイグレーション
-├── includes/
-│   ├── database.php        ... DB 接続ヘルパー
-│   ├── functions.php       ... 共通関数・ムード定義・セキュリティ関数
-│   ├── header.php          ... ナビゲーションバー
-│   └── footer.php          ... フッター
-├── api/
-│   ├── resonate.php        ... 共鳴 API（Ajax）
-│   ├── follow.php          ... フォロー API（Ajax）
-│   └── reply.php           ... 返信 API（Ajax）
-├── public/
-│   ├── css/style.css       ... ダーク + ネオン UI
-│   └── js/app.js           ... クライアント JS
-├── data/                   ... SQLiteDB保存先（.gitignoreで除外、自動生成）
-├── index.php               ... タイムライン
-├── post.php                ... 投稿ページ
-├── profile.php             ... プロフィール（タブ式）
-├── login.php               ... ログイン
-├── register.php            ... 新規登録
-└── logout.php              ... ログアウト
-```
 
 ---
 
@@ -225,7 +163,7 @@ pulse/
 
 **島田則幸（Noriyuki Shimada）**
 
-- 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
+- 🌐 [ポートフォリオサイト](http://shimada.atwebpages.com/pf/)
 - 📂 [ほかの作品](https://github.com/ns7jp/works)
 - 📧 net7jp@gmail.com
 
