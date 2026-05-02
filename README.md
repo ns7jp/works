@@ -163,7 +163,7 @@ php -S localhost:8000
 
 **島田則幸（Noriyuki Shimada）**
 
-- 🌐 [ポートフォリオサイト](http://shimada.atwebpages.com/pf/)
+- 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
 - 📂 [ほかの作品](https://github.com/ns7jp/works)
 - 📧 net7jp@gmail.com
 
