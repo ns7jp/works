@@ -347,6 +347,10 @@ def main(page: ft.Page):
     Flet がウィンドウを準備したあとに自動で呼ぶ関数。
     ここでアプリ本体クラスをインスタンス化することで、UI が組み立てられる。
     """
+    # 起動時のウィンドウサイズ。一回り小さめにして開く。
+    page.window.width = 720
+    page.window.height = 540
+
     TemplateManager(page)
 
 
