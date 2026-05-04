@@ -8,6 +8,13 @@
 #   左側: テンプレート一覧 + [新規作成][更新] ボタン
 #   右側: 内容の編集エリア + [保存][コピー][削除] ボタン
 #
+# コードを読む順番:
+#   1) main()                  … アプリを起動する入口
+#   2) TemplateManager.__init__ … 保存フォルダと画面部品を準備
+#   3) setup_ui()              … 左右2ペインの画面を組み立てる
+#   4) load/select/save 系      … ファイルを読み書きする処理を追う
+#   5) create/delete/copy 系    … ボタン操作ごとのイベント処理を追う
+#
 # 実行方法:
 #   1) 必要ライブラリをインストール: pip install flet pyperclip
 #   2) このファイルを実行:           python teikei_kanri.py
