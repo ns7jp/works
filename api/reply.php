@@ -16,6 +16,12 @@
  * 【レスポンス】
  *   GET  → { success: true, html: "<div>...</div>", count: 3 }
  *   POST → { success: true, reply_count: 4 }
+ *
+ * 【初学者向けの読み方】
+ *   1. $_SERVER['REQUEST_METHOD'] で GET と POST を分けている点を見る
+ *   2. GET は返信一覧を取得して HTML 文字列を組み立てる処理として読む
+ *   3. POST は親投稿 ID・本文・ムードを検証して INSERT する処理として読む
+ *   4. 返信も posts テーブルに入り、parent_id で親投稿と結びつく点を確認する
  */
 
 session_start();

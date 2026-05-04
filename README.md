@@ -78,6 +78,7 @@ Pulse では、投稿のたびに 8 種類の感情ムードから「今の気�
 
 ```
 SNSアプリ/
+├── CODE_WALKTHROUGH.md     ... 初学者向けの詳細なコード読解ガイド
 ├── config/
 │   └── database.php        ... DB 設定・スキーマ・マイグレーション
 ├── includes/
@@ -98,6 +99,8 @@ SNSアプリ/
 ├── register.php             ... 新規登録
 └── logout.php               ... ログアウト
 ```
+
+各ファイルの詳しい役割、読む順番、処理の追い方は [CODE_WALKTHROUGH.md](./CODE_WALKTHROUGH.md) にまとめています。
 
 ---
 

@@ -14,6 +14,12 @@
  *
  * 【レスポンス形式（JSON）】
  *   { "success": true, "following": true|false, "follower_count": 30 }
+ *
+ * 【初学者向けの読み方】
+ *   1. JSON を受け取るために php://input を読んでいる部分を見る
+ *   2. 自分自身をフォローできないようにする入力チェックを見る
+ *   3. 既にフォロー中なら DELETE、未フォローなら INSERT するトグル処理を見る
+ *   4. 最後に JSON を返し、JavaScript がボタン表示を更新する流れを確認する
  */
 
 session_start();

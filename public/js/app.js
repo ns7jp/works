@@ -12,6 +12,12 @@
  * 【ポイント】
  *   - サーバー通信は fetch() + async/await で書く（モダンな書き方）
  *   - DOM 操作は素の JavaScript（ライブラリ非依存）
+ *
+ * 【初学者向けの読み方】
+ *   1. toggleResonate() と toggleFollow() で「ボタン → fetch → JSON → 画面更新」の流れを見る
+ *   2. submitReply() / loadReplies() で、返信の送信と取得を追う
+ *   3. createRippleEffect() で、JavaScript が一時的な HTML 要素を作って演出する方法を見る
+ *   4. DOMContentLoaded の中で、ページ読み込み後にイベントを設定する流れを確認する
  */
 
 // =====================================================

@@ -16,6 +16,12 @@
  *   { "success": true, "resonated": true|false, "count": 5 }
  *     resonated … 操作後に共鳴中かどうか
  *     count     … 操作後の合計共鳴数
+ *
+ * 【初学者向けの読み方】
+ *   1. post_id を JSON から受け取り、対象投稿が存在するか確認する
+ *   2. resonances テーブルに既存行があるか SELECT で調べる
+ *   3. あれば DELETE、なければ INSERT するトグル処理を見る
+ *   4. 最新件数を JSON で返し、JavaScript 側の表示更新につながる点を確認する
  */
 
 session_start();

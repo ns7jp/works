@@ -17,6 +17,12 @@
  * 【PDO とは】
  *   - PHP Data Objects の略。MySQL / SQLite など複数の DB を統一インターフェースで扱える。
  *   - prepare() / execute() を使うと SQL インジェクション対策が自動で行われる。
+ *
+ * 【初学者向けの読み方】
+ *   1. getDB() で「保存先フォルダ作成 → SQLite 接続 → 初期化」の流れを見る
+ *   2. initDatabase() で users / posts / resonances / follows の役割を見る
+ *   3. 外部キー FOREIGN KEY と UNIQUE 制約が、データの整合性を守る点を見る
+ *   4. migrateDatabase() で、既存データを壊さず後からカラムを足す考え方を見る
  */
 
 // ----------------------------------------------------------------
