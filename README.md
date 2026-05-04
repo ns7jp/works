@@ -1,12 +1,14 @@
 # Works — ポートフォリオ作品集
 
-**島田則幸（Noriyuki Shimada）** が公共職業訓練（ISPアカデミー川越校 / 2025年10月〜2026年1月）の学習成果として制作した Web アプリ・デスクトップアプリ集です。
+**島田則幸（Noriyuki Shimada）** が公共職業訓練（ISPアカデミー川越校 / 2025年10月〜2026年1月）の学習成果として制作した Web アプリ・デスクトップアプリ・運用支援ツール集です。
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-777BB4?logo=php&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?logo=chartdotjs&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
 
@@ -22,7 +24,8 @@
 | ② | 掲示板アプリ | PHP / MySQL | [▶ Demo](http://shimada.atwebpages.com/post/) | [ns7jp/post](https://github.com/ns7jp/post)|
 | ③ | 定型文管理アプリ | Python / Flet | デスクトップ | [teikei_kanri.py](./teikei_kanri.py) |
 | ④ | 付箋アプリ | Python / tkinter | デスクトップ | [sticky_notes.py](./sticky_notes.py) |
-| ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](https://ns7jp.github.io/magic/) |
+| ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](https://ns7jp.github.io/magic/) | [ns7jp/magic](https://github.com/ns7jp/magic) |
+| ⑥ | サーバー監視ダッシュボード | Python / Flask / psutil / Chart.js | ローカル実行 | [ns7jp/server-monitor](https://github.com/ns7jp/server-monitor) |
 
 ---
 
@@ -223,12 +226,75 @@ python sticky_notes.py
 
 レスポンシブ対応のコーポレートサイト。コーディング課題として作成。
 
+📄 **コード**: [ns7jp/magic](https://github.com/ns7jp/magic)
+
 ### 🎯 主な実装
 
 - **レイアウト**: Flexbox / CSS Grid によるモダンな配置
 - **レスポンシブ対応**: メディアクエリでスマホ・タブレット・デスクトップに対応
 - **アニメーション**: jQuery でスクロール連動エフェクト・ハンバーガーメニューを実装
 - **セマンティック HTML**: header / nav / section / article / footer の適切な使い分け
+
+---
+
+## ⑥ サーバー監視ダッシュボード（Python / Flask / psutil / Chart.js）
+
+Python（Flask）+ psutil + Chart.js で構築した、リアルタイムサーバー監視ダッシュボードです。
+ブラウザから動作中マシンの CPU・メモリ・ディスク・ネットワーク・プロセス情報を可視化します。
+
+![サーバー監視ダッシュボード](https://raw.githubusercontent.com/ns7jp/server-monitor/main/screenshot.png)
+
+📄 **コード**: [ns7jp/server-monitor](https://github.com/ns7jp/server-monitor)
+
+### 🎯 主な実装機能
+
+| 機能 | 概要 |
+|------|------|
+| 🖥 システム情報 | OS・ホスト名・アーキテクチャ・起動時刻・稼働時間 |
+| ⚡ CPU使用率 | 全体使用率、コア別使用率、周波数情報を可視化 |
+| 🧠 メモリ・スワップ | 使用率・使用量・空き容量・スワップ使用状況 |
+| 💾 ディスク | 全パーティションの使用率をしきい値で色分け |
+| 🌐 ネットワークI/O | 累積送受信バイト・パケット数・リアルタイム速度 |
+| 📊 履歴グラフ | CPU / メモリの直近60秒推移を Chart.js で表示 |
+| 📋 プロセス一覧 | CPU使用率 TOP15 を PID・名前・ユーザー・CPU%・MEM% 付きで表示 |
+| 🔄 自動更新 | 統計は2秒ごと、プロセスは5秒ごとに Fetch API で非同期更新 |
+
+### 🏗 アーキテクチャ
+
+```text
+Browser
+  ├─ Chart.js で履歴グラフを描画
+  └─ Fetch API で定期更新
+        ↓
+Flask app
+  ├─ /api/stats
+  └─ /api/processes
+        ↓
+psutil
+  └─ OS からCPU・メモリ・ディスク・ネットワーク・プロセス情報を取得
+```
+
+### ⚙ 技術的な工夫
+
+- **しきい値ベースの色分け**: 使用率に応じて緑 → 黄 → 橙 → 赤へ自動変化
+- **CPU取得の安定化**: `psutil.cpu_percent(interval=0.5)` で初回取得の 0% 固定を回避
+- **ローリング履歴**: 過去30点（約60秒分）だけを保持して見やすい推移グラフに整理
+- **LAN公開を想定**: `host='0.0.0.0'` で同一ネットワーク内の他端末から確認可能
+
+### 🚀 実行方法
+
+```bash
+git clone https://github.com/ns7jp/server-monitor.git
+cd server-monitor
+pip install -r requirements.txt
+python app.py
+```
+
+起動後、ブラウザで以下にアクセスします。
+
+```text
+http://localhost:5000/
+```
 
 ---
 
