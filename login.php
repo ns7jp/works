@@ -75,6 +75,10 @@ include __DIR__ . '/includes/header.php';
         </h1>
         <p class="auth-subtitle">おかえりなさい</p>
 
+        <div class="alert alert-info">
+            <p>このデモは学習用です。実際に使っているメールアドレスやパスワードは入力しないでください。</p>
+        </div>
+
         <!-- エラーメッセージの表示エリア -->
         <?php if (!empty($errors)): ?>
             <div class="alert alert-error">
