@@ -439,7 +439,7 @@ Python 標準ライブラリのみで動作します。
 
 初学者向けに言うと、「Python でパソコンの状態を取得し、それを Web ページに表示する」作品です。Python の Flask が Web サーバーとして動き、`psutil` が OS から情報を取得し、JavaScript と Chart.js がブラウザ上でグラフや数値を更新します。
 
-![サーバー監視ダッシュボード](https://raw.githubusercontent.com/ns7jp/server-monitor/main/screenshot.png)
+![サーバー監視ダッシュボード](https://raw.githubusercontent.com/ns7jp/server-monitor/main/docs/screenshot.png)
 
 📄 **コード**: [ns7jp/server-monitor](https://github.com/ns7jp/server-monitor)
 
