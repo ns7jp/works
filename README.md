@@ -85,6 +85,18 @@ python -m http.server 8000
 
 ---
 
+### よくあるつまずきと対処
+
+| 症状 | 原因 / 対処 |
+|---|---|
+| Lightbox が動かない／画像をクリックしても拡大しない | `file://` 直開きが原因。方法B のローカルサーバー経由でアクセスしてください |
+| 表示が崩れる・古い CSS が残る | ブラウザキャッシュ。**Ctrl + F5**（Mac は Cmd + Shift + R）で強制リロード |
+| フォントが Times New Roman などになる | Google Fonts への接続失敗。ネットワーク・社内プロキシ環境を確認 |
+| 画像が表示されない | `image/` フォルダの場所、ファイル名（大文字小文字）、相対パスを確認 |
+| `python -m http.server` が「No module named」と出る | Python 3.x ではなく Python 2.x が呼ばれている可能性。`python3 -m http.server 8000` で試す |
+
+---
+
 ## 制作背景
 
 公共職業訓練「情報処理（Pythonエンジニア）コース」（ISPアカデミー川越校 / 2025年10月〜2026年1月）の **HTMLコーディング課題**として制作しました。
@@ -126,6 +138,19 @@ magic/
 - **Vanilla JavaScript の活用**：jQuery に頼らず、モダンな DOM API（`querySelector` / `addEventListener` / `IntersectionObserver` 等）で実装
 - **UXへの配慮**：スクロール連動アニメーション、スムーススクロール、ページロードフェードイン等、利用者の体験を意識した細部の演出
 - **アクセシビリティ**：セマンティック HTML、`aria-label` の付与、十分なコントラスト比
+
+---
+
+## 今後の改善案（TODO）
+
+- [ ] パフォーマンス最適化（画像の WebP 化、Lazy Load）
+- [ ] アクセシビリティの監査（Lighthouse / axe DevTools）
+- [ ] PageSpeed Insights スコア 90+ を目指した改善
+- [ ] お問い合わせフォームのサーバー連携（現在は JavaScript のみ）
+- [ ] ダークモード対応
+- [ ] 多言語対応（日本語 / 英語切り替え）
+
+学習を進めながら順次改善予定です。
 
 ---
 
