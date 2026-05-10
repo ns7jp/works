@@ -6,6 +6,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-5.7%2F8.0-4479A1?logo=mysql&logoColor=white)
 ![PDO](https://img.shields.io/badge/PDO-Prepared_Statements-success)
 ![XAMPP](https://img.shields.io/badge/XAMPP-tested-FB7A24?logo=xampp&logoColor=white)
+[![PHP check](https://github.com/ns7jp/post/actions/workflows/php-check.yml/badge.svg)](https://github.com/ns7jp/post/actions/workflows/php-check.yml)
 
 ユーザー登録・ログイン・投稿・返信・削除という Web アプリの基本操作を、シンプルな画面でひと通り体験できる掲示板です。
 SNS アプリ「[Pulse](https://github.com/ns7jp/pulse)」が独自機能中心なのに対し、こちらは **「Web 開発の基本フローを最短経路で体感できる」** ことを優先した題材として作りました。
