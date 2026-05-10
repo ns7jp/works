@@ -7,6 +7,7 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)
 ![jQuery](https://img.shields.io/badge/jQuery-Lightbox-0769AD?logo=jquery&logoColor=white)
 ![Responsive](https://img.shields.io/badge/Responsive-Mobile%20First-success)
+[![Static site check](https://github.com/ns7jp/magic/actions/workflows/static-check.yml/badge.svg)](https://github.com/ns7jp/magic/actions/workflows/static-check.yml)
 
 🔗 **ライブデモ**: https://ns7jp.github.io/magic/
 ---
@@ -166,6 +167,6 @@ magic/
 
 ## ライセンス
 
-このリポジトリの**コード**（HTML / CSS / JavaScript）は学習目的で公開しています。参考としてご活用いただけます。
+このリポジトリの**コード**（HTML / CSS / JavaScript）は [MIT License](./LICENSE) のもとで公開しています。学習・参考目的でご活用いただけます。
 
 画像素材は訓練校提供のため、再配布はご遠慮ください。
