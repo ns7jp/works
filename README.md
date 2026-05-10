@@ -6,6 +6,7 @@
 ![SQLite](https://img.shields.io/badge/SQLite-PDO-003B57?logo=sqlite&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)
 ![Security](https://img.shields.io/badge/Security-CSRF%2FXSS%2Fbcrypt-success)
+[![PHP check](https://github.com/ns7jp/pulse/actions/workflows/php-check.yml/badge.svg)](https://github.com/ns7jp/pulse/actions/workflows/php-check.yml)
 
 Pulse は、感情をベースにしたまったく新しいソーシャルネットワーキングサービスです。
 従来の SNS のように情報を発信するだけでなく、「今この瞬間の気持ち」を共有し、
@@ -262,4 +263,4 @@ php -S localhost:8080
 
 ## ライセンス
 
-このリポジトリのコードは学習目的で公開しています。参考としてご活用いただけます。
+このリポジトリのコードは [MIT License](./LICENSE) のもとで公開しています。学習・参考目的でご活用いただけます。
