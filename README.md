@@ -1,260 +1,178 @@
-# Mini BBS — シンプル掲示板アプリ
+# Mini BBS — PHP 掲示板とサーバー構築の学習ポートフォリオ
 
-**Web アプリの「土台」を最短経路で体感する、PHP + MySQL の基本に集中した掲示板。**
+PHP + MySQL の掲示板を、ローカル環境から Ubuntu Server へ構築する流れを学ぶ作品です。未経験者が「アプリを作る」だけでなく、導入、設定、動作確認、ログ調査、ロールバックまで説明できることを目標にしています。
 
-![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?logo=php&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-5.7%2F8.0-4479A1?logo=mysql&logoColor=white)
-![PDO](https://img.shields.io/badge/PDO-Prepared_Statements-success)
-![XAMPP](https://img.shields.io/badge/XAMPP-tested-FB7A24?logo=xampp&logoColor=white)
 [![PHP check](https://github.com/ns7jp/post/actions/workflows/php-check.yml/badge.svg)](https://github.com/ns7jp/post/actions/workflows/php-check.yml)
 
-ユーザー登録・ログイン・投稿・返信・削除という Web アプリの基本操作を、シンプルな画面でひと通り体験できる掲示板です。
-SNS アプリ「[Pulse](https://github.com/ns7jp/pulse)」が独自機能中心なのに対し、こちらは **「Web 開発の基本フローを最短経路で体感できる」** ことを優先した題材として作りました。
+> ライブデモ: http://shimada.atwebpages.com/post/login.php
+>
+> 学習用の HTTP サイトです。本物の氏名、メールアドレス、使い回しているパスワードは入力しないでください。
 
-🔗 **ライブデモ**: http://shimada.atwebpages.com/post/login.php
+## 30秒で分かるこの作品
 
-> ⚠️ デモは無料ホスティング（HTTP）の学習用です。実際のログイン情報は使用しないでください（新規登録は自由にお試しいただけます。テストデータ前提のサイトとしてご利用ください）。
-
----
-
-## 主な機能
-
-| 機能 | 概要 |
+| 観点 | 内容 |
 |---|---|
-| ユーザー登録 | 名前・メールアドレス・パスワードで会員登録 |
-| ログイン / ログアウト | セッションを使った認証状態の保持 |
-| 投稿作成 | フォームから本文を送信しデータベースに保存 |
-| 返信投稿 | 元の投稿に紐づけて返信（親投稿IDを保持） |
-| 投稿削除 | 自分の投稿のみ削除可能 |
-| カード型 UI | 投稿一覧を読みやすいカード形式で表示 |
-| レスポンシブ対応 | PC・タブレット・スマートフォンに対応 |
+| 利用者ができること | 会員登録、ログイン、投稿、返信、自分の投稿の削除 |
+| アプリ技術 | PHP 8、PDO、MySQL / MariaDB、HTML、CSS |
+| サーバー技術 | Ubuntu Server、Apache、systemd、ログ確認、権限設定 |
+| 学習できること | HTTP → PHP → DB の流れ、SQL、セッション、障害切り分け |
+| 自動確認 | GitHub Actions で全 PHP ファイルの構文検査 |
+| 実環境検証 | このリポジトリ上では `NOT RUN`。実施時は結果票へ記録 |
 
----
-
-## デザインの特徴
-
-- **グラデーション背景**：紫系（`#667eea` → `#764ba2`）で高級感を演出
-- **カード型レイアウト**：投稿を立体的なカードで表示
-- **シャドウ効果**：各要素に影で奥行きを表現
-- **アニメーション**：ページ読み込み時とホバー時のスムーズな遷移
-- **絵文字アイコン**：各機能に直感的な絵文字を追加
-
-カラースキーム：
-
-| 用途 | カラーコード |
-|---|---|
-| メインカラー | `#667eea`（紫）|
-| セカンダリカラー | `#764ba2`（濃い紫）|
-| アクセントカラー | `#e74c3c`（赤）|
-
----
-
-## ディレクトリ構成
+## 構成
 
 ```text
-post/
-├── README.md
-├── CODE_WALKTHROUGH.md      ... 初学者向けコード読解ガイド
-├── DATABASE_SETUP.md        ... DB構造・セットアップ補足
-├── db.example.php           ... DB 接続設定の見本（実運用は db.php を別途作成）
-│
-├── index.php / index2.php   ... 投稿一覧ページ（通常版・返信表示版）
-├── login.php                ... ログイン画面
-├── check.php                ... ログイン認証処理
-├── input.php                ... 新規会員登録フォーム
-├── comfirm.php              ... 登録確認ページ
-├── regist.php               ... 会員登録処理
-├── write.php / write2.php   ... 投稿処理（通常・返信）
-├── reply.php                ... 返信入力画面
-├── delete.php               ... 投稿削除処理
-├── logout.php               ... ログアウト処理
-├── error.php                ... エラーページ
-│
-├── style.css                ... スタイリッシュなUIスタイル
-└── image/                   ... プロフィール画像保存先（手動作成）
+ブラウザ
+   │ HTTP
+   ▼
+Apache ── PHP ── PDO ── MySQL / MariaDB
+                     ├─ members（会員）
+                     └─ posts（投稿・返信）
 ```
 
-詳しい役割と読む順番は [CODE_WALKTHROUGH.md](./CODE_WALKTHROUGH.md) を参照してください。
+覚え方は「Apache が受け取る → PHP が処理する → MySQL が記録する」です。
 
----
+## 最短セットアップ（XAMPP）
 
-## セットアップ
+### 1. 必要なもの
 
-### 1. 動作要件
-
-- PHP 8.x 以上（PDO MySQL 拡張モジュール）
+- PHP 8.x（`pdo_mysql`、`mbstring`）
 - MySQL 5.7 / 8.0 または MariaDB 10.x
-- Apache（XAMPP / MAMP / 単体）など
+- Apache（XAMPP でも可）
 
-XAMPP がインストールされていれば最も簡単に動かせます。
-
-### 2. リポジトリを取得
+### 2. 取得と DB 作成
 
 ```bash
 git clone https://github.com/ns7jp/post.git
 cd post
+mysql -u root -p < database/schema.sql
 ```
 
-### 3. データベース作成
+成功確認:
 
-MySQL に接続して以下を実行：
-
-```sql
-CREATE DATABASE mini_bbs CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-
-USE mini_bbs;
-
-CREATE TABLE members (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    mail VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    picture VARCHAR(255) DEFAULT NULL
-);
-
-CREATE TABLE posts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    member_id INT NOT NULL,
-    message TEXT NOT NULL,
-    reply_post_id INT DEFAULT 0,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
-);
+```bash
+mysql -u root -p -e "USE mini_bbs; SHOW TABLES;"
 ```
 
-### 4. 接続情報の設定
+`members` と `posts` が表示されれば成功です。
 
-`db.example.php` をコピーして `db.php` を作成：
+### 3. 接続設定
 
 ```bash
 cp db.example.php db.php
 ```
 
-`db.php` を開き、自分の環境に合わせて編集：
+`db.php` の4つの見本値を、自分の DB 名、ホスト、ユーザー、パスワードへ変更します。`db.php` は `.gitignore` の対象です。秘密情報を GitHub へ push しないでください。
 
-```php
-$db = new PDO('mysql:dbname=mini_bbs;host=127.0.0.1;charset=utf8mb4', 'root', '');
-```
+### 4. 起動
 
-> ⚠️ `db.php` は接続パスワードを含むため `.gitignore` で除外してください。GitHub に**絶対に push しない**ように注意。
-
-### 5. 画像フォルダ作成
+XAMPP ではリポジトリを `htdocs/post/` に配置し、Apache と MySQL を開始します。PHP の開発用サーバーを使う場合:
 
 ```bash
-mkdir image
-chmod 755 image
+php -S 127.0.0.1:8000
 ```
 
-> Web サーバーから書き込みが必要な場合は、`777` で全ユーザーに開放するのではなく、サーバー実行ユーザーに合わせて所有者・グループ権限を調整してください。
+`http://127.0.0.1:8000/login.php` を開きます。開発用サーバーをインターネット公開には使いません。
 
-### 6. 起動
+## 初心者向けの学習順序
 
-XAMPP の場合は `htdocs/post/` に配置してブラウザで以下を開きます：
-
-```text
-http://localhost/post/login.php
-```
-
-PHP 単体実行の場合：
-
-```bash
-php -S localhost:8000
-```
-
-ブラウザで `http://localhost:8000/login.php` を開き、新規登録から開始してください。
-
----
-
-## セキュリティ実装
-
-学習目的の作品ですが、Web アプリケーションのセキュリティ基礎を意識して実装しています。
-
-| 対策 | 実装内容 | 該当ファイル |
+| 段階 | 読む・試すもの | 覚えること |
 |---|---|---|
-| **SQLインジェクション** | PDO + プリペアドステートメント（`prepare()` / `execute()`） | `check.php`, `regist.php`, `write.php` ほか |
-| **XSS** | `htmlspecialchars()` で投稿・ユーザー名を出力時にエスケープ | `index.php`, `index2.php`, `reply.php` |
-| **CSRF** | フォームに CSRF トークンを埋め込み、送信時に検証 | `login.php`, `input.php`, `regist.php` |
-| **パスワード保護** | `password_hash()`（bcrypt）でハッシュ化保存、`password_verify()` で照合 | `regist.php`, `check.php` |
-| **接続情報の保護** | `db.php` を `.gitignore` で除外し、見本として `db.example.php` を提供 | リポジトリ全体 |
-| **権限チェック** | 削除時にログインユーザーIDと投稿者IDを照合 | `delete.php` |
+| 1 | README と `database/schema.sql` | 全体構成と2つのテーブル |
+| 2 | `login.php` → `check.php` | フォーム、POST、セッション |
+| 3 | `index.php` → `write.php` | SELECT と INSERT |
+| 4 | `reply.php` → `write2.php` | 親投稿 ID の関連付け |
+| 5 | `delete.php` | DELETE と権限確認の必要性 |
+| 6 | `docs/SERVER_BUILD.md` | サービス、ポート、権限、ログ |
 
----
+詳しいコードの読み方は [CODE_WALKTHROUGH.md](CODE_WALKTHROUGH.md)、DB の説明は [DATABASE_SETUP.md](DATABASE_SETUP.md) を参照してください。
 
-## トラブルシューティング（利用者向け）
+## サーバー構築の実践
 
-### Q. `Connection refused` で接続できない
+- [Ubuntu サーバー構築手順](docs/SERVER_BUILD.md)
+- [構築・動作検証記録テンプレート](docs/VALIDATION.md)
 
-MySQL サーバーが起動していません。
+構築後は「動きました」だけで終わらせず、OS、バージョン、確認コマンド、期待値、結果、ログを記録します。未実施は `NOT RUN` のままにします。
 
-- XAMPP：Control Panel から MySQL を Start
-- Linux：`sudo systemctl start mysql`
-- macOS：`brew services start mysql`
+## 機能とコード
 
-### Q. `Access denied for user 'root'@'localhost'` のエラー
+| 機能 | 主なファイル |
+|---|---|
+| 会員登録 | `input.php` → `comfirm.php` → `regist.php` |
+| ログイン | `login.php` → `check.php` |
+| 一覧・投稿 | `index.php` → `write.php` |
+| 返信 | `reply.php` → `write2.php` |
+| 削除 | `delete.php` |
+| DB 接続 | `db.example.php` をコピーした `db.php` |
 
-`db.php` のパスワードと実際の MySQL のパスワードが一致していません。XAMPP の初期 root ユーザーはパスワードなしですが、MySQL を別途インストールした場合は設定したパスワードを入力してください。
+`comfirm.php` は元コードのファイル名を保っています（正しい英単語は `confirm`）。
 
-### Q. `Unknown database 'mini_bbs'` のエラー
+## セキュリティの現在地
 
-データベースが作成されていません。上記「3. データベース作成」の SQL を実行してください。
+### 実装済み
 
-### Q. 新規登録で `No such file or directory`
+- PDO のプリペアドステートメント
+- `password_hash()` / `password_verify()`
+- 主な画面出力の `htmlspecialchars()`
+- ログインフォームの CSRF トークン
+- 一覧画面では自分の投稿にだけ削除リンクを表示
+- DB 接続情報を `.gitignore` で除外
 
-`db.example.php` をコピーして `db.php` を作成していない可能性があります。
+### 未実装・要改善
 
-### Q. ブラウザで CSS が当たっていない
+- `delete.php` 側の所有者検証と POST + CSRF 化
+- 投稿、返信、会員登録を含む全状態変更フォームの CSRF 対策
+- アップロード画像の MIME、容量、拡張子検証
+- セッション ID の再生成、Cookie 属性の強化
+- 入力文字数制限、レート制限、監査ログ
+- HTTPS 化とセキュリティヘッダー
 
-`style.css` のパス解決が環境によって変わります。XAMPP 経由なら `http://localhost/post/login.php`、PHP 単体なら `http://localhost:8000/login.php` でアクセスしてください。
+このコードをそのまま本番公開することは推奨しません。一覧に削除リンクが出ないことは、処理側の認可対策の代わりにはなりません。
 
----
+## 動作確認チェックリスト
 
-## ブラウザ対応
+- [ ] `php -l` で全 PHP ファイルが構文エラーなし
+- [ ] `members` と `posts` テーブルが存在する
+- [ ] テスト用データで登録・ログインできる
+- [ ] 投稿と返信が保存される
+- [ ] 自分のテスト投稿を削除できる
+- [ ] Apache / PHP / DB のログに想定外のエラーがない
+- [ ] 実施結果を `docs/VALIDATION.md` のコピーへ記録した
 
-- Google Chrome（推奨）
-- Mozilla Firefox
-- Safari
-- Microsoft Edge
+```bash
+find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+```
 
----
+## よくある障害
 
-## 学んだこと・工夫した点
+| 症状 | 最初の確認 |
+|---|---|
+| `Connection refused` | MySQL / MariaDB が起動しているか |
+| `Access denied` | `db.php` のユーザーとパスワード |
+| `Unknown database` | `database/schema.sql` を読み込んだか |
+| `Table ... doesn't exist` | `USE mini_bbs; SHOW TABLES;` |
+| 画面が真っ白 | PHP / Apache のエラーログ |
+| 画像を保存できない | `image/` の所有者と書込権限 |
 
-- **PDO + プリペアドステートメント**：「動けば良い」ではなく、SQLインジェクション・XSS・CSRF を意識した実装
-- **責務の分離**：表示用ファイル（`index.php`、`login.php`）と処理用ファイル（`check.php`、`write.php`）を分け、入力画面と処理を明確に区分
-- **`.gitignore` による接続情報の保護**：`db.php` を除外し、`db.example.php` を見本としてコミットすることで、フォークした第三者が安全に環境構築できる構成
-- **返信機能の実装**：`reply_post_id` カラムで投稿同士の関連を表現し、データベース設計の基本（外部キー的な使い方）を体験
-- **シンプルな起点**：Pulse の独自機能を盛り込む前段階として、Web 開発の基本フローを最短経路で体感できる教材を意識
+切り分けは「ネットワーク → サービス → 設定 → ログ → DB」の順に進めます。
 
----
+## 今後の改善
 
-## 今後追加したい機能（TODO）
-
-- [ ] 投稿編集機能
-- [ ] 投稿への画像添付
-- [ ] ページネーション（投稿数が増えた時の対応）
-- [ ] 検索機能
-- [ ] パスワードリセット
-- [ ] CSRF トークン検証の網羅的見直し
-- [ ] HTTPS 対応（独自ドメイン取得後）
-
----
+- [ ] 上記の未実装セキュリティ対策
+- [ ] 自動テストとテストデータ作成手順
+- [ ] HTTPS 対応
+- [ ] 投稿編集、検索、ページネーション
+- [ ] バックアップとリストアの実測記録
+- [ ] 監視、障害通知、復旧手順
 
 ## 制作背景
 
-公共職業訓練「情報処理（Pythonエンジニア）コース」（ISPアカデミー川越校 / 2025年10月〜2026年1月）の学習成果として制作。基本機能のみに絞り、Web アプリ開発の流れを最初に理解するための題材として位置づけています。
+公共職業訓練「情報処理（Pythonエンジニア）コース」（2025年10月〜2026年1月）の学習成果として制作しました。アプリ開発の題材を、サーバー構築・確認・運用まで説明できるポートフォリオへ発展させています。
 
----
+## 作者・ライセンス
 
-## 著者
+島田則幸（Noriyuki Shimada）
 
-**島田則幸（Noriyuki Shimada）**
+[ポートフォリオ](https://ns7jp.github.io/) / [ほかの作品](https://github.com/ns7jp/works)
 
-- 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
-- 📂 [ほかの作品](https://github.com/ns7jp/works)
-- 📧 net7jp@gmail.com
-
----
-
-## ライセンス
-
-[MIT License](./LICENSE) のもと公開しています。学習・参考目的での利用、フォーク、派生作品の作成を歓迎します。商用利用も可能ですが、自己責任でお願いします。
+[MIT License](LICENSE)

@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS mini_bbs
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE mini_bbs;
+
+CREATE TABLE IF NOT EXISTS members (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    picture VARCHAR(255) NOT NULL DEFAULT '',
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS posts (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    member_id INT UNSIGNED NOT NULL,
+    message TEXT NOT NULL,
+    reply_post_id INT UNSIGNED NOT NULL DEFAULT 0,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_posts_member_id (member_id),
+    INDEX idx_posts_reply_post_id (reply_post_id),
+    CONSTRAINT fk_posts_member
+      FOREIGN KEY (member_id) REFERENCES members(id)
+      ON DELETE CASCADE
+) ENGINE=InnoDB;
