@@ -18,3 +18,18 @@ jobs:
 
       - name: Check local HTML links
         run: node scripts/check-static-links.js
+
+  nginx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Compose file
+        run: docker compose config --quiet
+
+      - name: Build image
+        run: docker build --tag magicmoon:test .
+
+      - name: Validate Nginx configuration
+        run: docker run --rm magicmoon:test nginx -t
