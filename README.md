@@ -33,7 +33,8 @@
 1. 下の「身につけた力と証拠」で、学習内容と確認先を見る
 2. [サーバー監視ダッシュボード](#⑥-サーバー監視ダッシュボードpython--flask--psutil--chartjs) で、監視の仕組みを見る
 3. [初学者向け学習ガイド](./docs/server-engineer-guide.md) で、用語と学習順を見る
-4. [確認記録テンプレート](./docs/verification-record.md) で、作業を証拠として残す方法を見る
+4. [Pythonキーワード集](./docs/python-keywords.md) / [PHPキーワード集](./docs/php-keywords.md) で、作品に出てくるコードを読む
+5. [確認記録テンプレート](./docs/verification-record.md) で、作業を証拠として残す方法を見る
 
 ### 身につけた力と証拠
 
@@ -83,6 +84,8 @@ works/
 │   ├── sticky_notes.png  ... 付箋アプリのスクリーンショット
 │   ├── demo-flow.md      ... デスクトップアプリの操作確認フロー
 │   ├── server-engineer-guide.md ... 初学者向けの用語・演習・障害対応
+│   ├── python-keywords.md ... Pythonの基本語とサーバー運用での使い方
+│   ├── php-keywords.md    ... PHPの基本語と安全なWeb処理の考え方
 │   └── verification-record.md   ... 構築・確認結果の記録テンプレート
 ├── scripts/
 │   └── check_docs.py     ... README と docs のローカルリンク確認
@@ -103,6 +106,17 @@ works/
 外部リポジトリの作品も、主要ファイル名と役割をこの README 内で説明しています。ローカルに置いてある `teikei_kanri.py` と `sticky_notes.py` は、コード内にも初学者向けコメントを多めに入れています。
 
 デスクトップアプリの操作は [docs/demo-flow.md](./docs/demo-flow.md) に、起動後の確認手順と期待結果をまとめています。
+
+### Python・PHPキーワード集
+
+暗記だけで終わらないよう、各用語を「ひとことで言うと → 例 → サーバー構築・運用とのつながり」の順で説明しています。
+
+| 教材 | 最初に覚える言葉 | このポートフォリオで読む場所 |
+|---|---|---|
+| [Pythonキーワード集](./docs/python-keywords.md) | 変数、型、条件分岐、繰り返し、関数、例外、モジュール | `teikei_kanri.py`、`sticky_notes.py`、server-monitor |
+| [PHPキーワード集](./docs/php-keywords.md) | 変数、配列、フォーム、セッション、PDO、エスケープ | Pulse、掲示板アプリ |
+
+どちらも最後に確認問題とミニ演習があります。読むだけでなく、結果を予想してから自分の学習用環境で実行してください。
 
 ---
 
