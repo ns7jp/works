@@ -11,6 +11,7 @@
  * 【リクエスト形式】
  *   GET  /api/reply.php?post_id=123
  *   POST /api/reply.php
+ *        Header: X-CSRF-Token: <画面のmeta要素にあるトークン>
  *        Body: { "parent_id": 123, "content": "...", "mood": "joy" }
  *
  * 【レスポンス】
@@ -18,13 +19,13 @@
  *   POST → { success: true, reply_count: 4 }
  *
  * 【初学者向けの読み方】
- *   1. $_SERVER['REQUEST_METHOD'] で GET と POST を分けている点を見る
- *   2. GET は返信一覧を取得して HTML 文字列を組み立てる処理として読む
- *   3. POST は親投稿 ID・本文・ムードを検証して INSERT する処理として読む
- *   4. 返信も posts テーブルに入り、parent_id で親投稿と結びつく点を確認する
+ *   1. 認証後、$_SERVER['REQUEST_METHOD'] で GET と POST を分ける
+ *   2. GETは親投稿の公開可否を確認し、安全なHTMLを組み立てる
+ *   3. POSTはCSRF、JSON型、親投稿の公開可否、本文、ムードを検証する
+ *   4. 返信をpostsへ保存し、parent_idで親投稿と結びつける
  */
 
-session_start();
+require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 
 header('Content-Type: application/json');
@@ -47,10 +48,24 @@ $method = $_SERVER['REQUEST_METHOD'];
 //  そのため値の出力は予め手動で安全に組み立てる必要がある。
 // =====================================================
 if ($method === 'GET') {
-    $postId = (int)($_GET['post_id'] ?? 0);
+    $rawPostId = $_GET['post_id'] ?? null;
+    $postId = is_string($rawPostId) && ctype_digit($rawPostId) ? (int)$rawPostId : 0;
     if ($postId <= 0) {
         http_response_code(400);
         echo json_encode(['error' => '不正なリクエストです']);
+        exit;
+    }
+
+    // 非公開のタイムカプセルや返信IDを親として参照させない。
+    $stmt = $pdo->prepare('
+        SELECT id FROM posts
+        WHERE id = ? AND parent_id IS NULL
+          AND (is_timecapsule = 0 OR reveal_at <= ?)
+    ');
+    $stmt->execute([$postId, nowJST()]);
+    if (!$stmt->fetch()) {
+        http_response_code(404);
+        echo json_encode(['error' => '投稿が見つかりません']);
         exit;
     }
 
@@ -66,8 +81,14 @@ if ($method === 'GET') {
         $moodLabel = $moods[$reply['mood']]['label'] ?? '';
 
         // 表示用の値を整形
-        $initial         = mb_substr($reply['display_name'], 0, 1);
-        $time            = timeAgo($reply['created_at']);
+        $replyUserId     = (int)$reply['user_id'];
+        $replyId         = (int)$reply['id'];
+        $resonanceCount  = (int)$reply['resonance_count'];
+        $displayName     = h($reply['display_name']);
+        $username        = h($reply['username']);
+        $avatarColor     = h($reply['avatar_color']);
+        $initial         = h(mb_substr($reply['display_name'], 0, 1));
+        $time            = h(timeAgo($reply['created_at']));
         $content         = nl2br(h($reply['content']));     // 本文は h() で必ずエスケープ
         $resonatedClass  = $reply['user_resonated'] ? 'resonated' : '';
 
@@ -75,11 +96,11 @@ if ($method === 'GET') {
         $html .= <<<HTML
         <div class="reply-card" style="--mood-color:{$moodColor}">
             <div class="reply-header">
-                <a href="profile.php?id={$reply['user_id']}" class="avatar-xs"
-                   style="background:{$reply['avatar_color']}">{$initial}</a>
+                <a href="profile.php?id={$replyUserId}" class="avatar-xs"
+                   style="background:{$avatarColor}">{$initial}</a>
                 <div class="reply-meta">
-                    <a href="profile.php?id={$reply['user_id']}" class="reply-author">{$reply['display_name']}</a>
-                    <span class="reply-username">@{$reply['username']}</span>
+                    <a href="profile.php?id={$replyUserId}" class="reply-author">{$displayName}</a>
+                    <span class="reply-username">@{$username}</span>
                     <span class="reply-time">{$time}</span>
                 </div>
                 <span class="reply-mood-badge" style="background:{$moodColor}">{$moodEmoji} {$moodLabel}</span>
@@ -87,10 +108,10 @@ if ($method === 'GET') {
             <div class="reply-content"><p>{$content}</p></div>
             <div class="reply-actions">
                 <button class="resonate-btn resonate-btn-sm {$resonatedClass}"
-                        data-post-id="{$reply['id']}"
+                        data-post-id="{$replyId}"
                         onclick="toggleResonate(this)">
                     <span class="resonate-icon">◎</span>
-                    <span class="resonate-count">{$reply['resonance_count']}</span>
+                    <span class="resonate-count">{$resonanceCount}</span>
                 </button>
             </div>
         </div>
@@ -105,10 +126,21 @@ if ($method === 'GET') {
 //  POST: 返信を投稿
 // =====================================================
 if ($method === 'POST') {
-    $data     = json_decode(file_get_contents('php://input'), true);
-    $parentId = (int)($data['parent_id'] ?? 0);
-    $content  = trim($data['content'] ?? '');
-    $mood     = $data['mood'] ?? 'calm';
+    if (!verifyCSRFToken($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
+        http_response_code(403);
+        echo json_encode(['error' => 'CSRF トークンが無効です']);
+        exit;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($data) || !is_int($data['parent_id'] ?? null)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'JSON形式の親投稿IDが必要です']);
+        exit;
+    }
+    $parentId = $data['parent_id'];
+    $content  = is_string($data['content'] ?? null) ? trim($data['content']) : '';
+    $mood     = is_string($data['mood'] ?? null) ? $data['mood'] : 'calm';
     $moods    = getMoods();
 
     if ($parentId <= 0) {
@@ -118,8 +150,12 @@ if ($method === 'POST') {
     }
 
     // 親投稿の存在確認
-    $stmt = $pdo->prepare('SELECT id FROM posts WHERE id = ?');
-    $stmt->execute([$parentId]);
+    $stmt = $pdo->prepare('
+        SELECT id FROM posts
+        WHERE id = ? AND parent_id IS NULL
+          AND (is_timecapsule = 0 OR reveal_at <= ?)
+    ');
+    $stmt->execute([$parentId, nowJST()]);
     if (!$stmt->fetch()) {
         http_response_code(404);
         echo json_encode(['error' => '投稿が見つかりません']);

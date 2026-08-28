@@ -1,266 +1,179 @@
-# Pulse（パルス） - 感情共鳴型SNS
+# Pulse サーバー構築ポートフォリオ
 
-**「いいね」ではなく、「共鳴」で繋がる。**
+感情を共有するSNS「Pulse」を題材に、**Webサーバーを構築し、安全に動かし、確認し、障害対応する流れ**を学ぶポートフォリオです。
 
-![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?logo=php&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-PDO-003B57?logo=sqlite&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)
-![Security](https://img.shields.io/badge/Security-CSRF%2FXSS%2Fbcrypt-success)
 [![PHP check](https://github.com/ns7jp/pulse/actions/workflows/php-check.yml/badge.svg)](https://github.com/ns7jp/pulse/actions/workflows/php-check.yml)
 
-Pulse は、感情をベースにしたまったく新しいソーシャルネットワーキングサービスです。
-従来の SNS のように情報を発信するだけでなく、「今この瞬間の気持ち」を共有し、
-感情で人と人が繋がる体験を提供します。
+> 対象は未経験からサーバー構築エンジニアを目指す学習者です。実行していない作業は `NOT RUN` として扱い、静的チェックと実環境の動作確認を区別します。
 
-🔗 **ライブデモ**: http://shimada.atwebpages.com/pulse/
+## 3分で分かるこの作品
 
-> ⚠️ **デモサイトは無料ホスティング（HTTP）で運用しています。** 学習目的のため、本番運用はしていません。実際のログイン情報は使用しないでください（テストアカウントで動作確認できます）。
+| 観点 | 内容 |
+|---|---|
+| 構成対象 | PHP 8.2 / Apache / SQLiteのWebアプリ実行環境 |
+| 再現方法 | DockerfileとDocker Compose |
+| 安全性 | localhost限定公開、読み取り専用コンテナ、権限削減、CSRF/XSS/SQLi対策 |
+| 稼働・健全性確認 | Docker healthcheck、`health.php`、smoke test |
+| 運用 | ログ確認、バックアップ、更新、障害切り分け手順 |
+| 証跡 | 実行結果をPASS / FAIL / NOT RUNで残すテンプレート |
 
----
+この作品で説明できることは、単に「アプリを作った」だけではありません。
 
-## コンセプト
+- Apache、PHP、SQLite、Docker volumeの役割
+- ポート公開からHTTP応答、DB接続までの確認方法
+- ログを使った障害原因の切り分け
+- データを残した停止と、データを失う削除操作の違い
+- 実装済みの対策と、本番公開前に必要な未実装対策の境界
 
-日常の中で感じた喜び、愛、穏やかさ、活力、悲しみ、怒り、驚き、不安 ——
-Pulse では、投稿のたびに 8 種類の感情ムードから「今の気分」を選択します。
-タイムラインは感情の色で彩られ、コミュニティ全体の気分が可視化されます。
+対象範囲は、**Docker導入済みの1台のホスト上でWebコンテナを構築・運用するところまで**です。OSインストール、SSH、ホストファイアウォール、DNS、TLS、複数台冗長化は未構築・未検証であり、この作品の実績には含めません。
 
----
-
-## 主な機能
-
-### 感情ムード投稿
-投稿時に 8 種類のムードから今の気持ちを選択。投稿カードはムードの色で彩られ、タイムラインが感情のグラデーションで表現されます。
-
-| | ムード | キーワード | 用途例 |
-|---|---|---|---|
-| ✨ | 喜び | Joy | 楽しい出来事の共有 |
-| 💗 | 愛 | Love | 大切な人・物への気持ち |
-| 🌊 | 穏やか | Calm | 平和な気分 |
-| ⚡ | 活力 | Energy | やる気・達成感 |
-| 🌧️ | 悲しみ | Sadness | つらい気分の吐露 |
-| 🔥 | 怒り | Anger | フラストレーション |
-| 💫 | 驚き | Surprise | 思いがけない出来事 |
-| 🌑 | 不安 | Anxiety | モヤモヤを言語化 |
-
-### 共鳴（レゾナンス）
-「いいね」の代わりに「共鳴」ボタンを搭載。
-相手の感情に共感したとき、波紋エフェクトとともに共鳴が広がります。
-
-### 感情天気予報
-サイドバーにコミュニティ全体の直近 24 時間の感情分布をリアルタイム表示。
-今のコミュニティの「感情の天気」がひと目でわかります。
-
-### 感情オーラ
-プロフィールページに直近 7 日間の感情傾向を「オーラ」として表示。
-浮遊するアニメーションで、その人の感情の個性が視覚的に伝わります。
-
-### ささやきモード
-匿名で投稿できる「ささやき」機能。
-名前を隠して本音を共有でき、気軽に感情を表現できます。
-
-### タイムカプセル
-未来の日時を指定して投稿する機能。
-指定した時刻になるまで投稿は公開されず、過去の自分から届くメッセージとして表示されます。
-
-### 返信・スレッド
-投稿に対してインラインで返信が可能。
-返信にもムード選択と共鳴機能があり、感情の対話が生まれます。
-
-### フォロー・プロフィール
-ユーザーのフォロー/フォロワー関係を管理。
-プロフィールページではパルス履歴・フォロワー一覧・フォロー中一覧をタブ切り替えで確認できます。
-
----
-
-## 技術構成
-
-| 項目             | 技術                                      |
-|-----------------|------------------------------------------|
-| バックエンド       | PHP 8.x                                 |
-| データベース       | SQLite（PDO）                             |
-| フロントエンド     | HTML / CSS / JavaScript（Vanilla）         |
-| テーマ           | ダークテーマ + ネオンアクセント                |
-| 認証             | セッション認証 / CSRF 保護 / bcrypt ハッシュ  |
-| タイムゾーン       | 日本時間（JST / Asia/Tokyo）               |
-
----
-
-## ディレクトリ構成
-
-```
-pulse/
-├── CODE_WALKTHROUGH.md     ... 初学者向けの詳細なコード読解ガイド
-├── config/
-│   └── database.php        ... DB 設定・スキーマ・マイグレーション
-├── includes/
-│   ├── functions.php        ... 共通関数・ムード定義
-│   ├── header.php           ... ナビゲーションバー
-│   └── footer.php           ... フッター
-├── api/
-│   ├── resonate.php         ... 共鳴 API（Ajax）
-│   ├── follow.php           ... フォロー API（Ajax）
-│   └── reply.php            ... 返信 API（Ajax）
-├── public/
-│   ├── css/style.css        ... ダーク + ネオン UI
-│   └── js/app.js            ... クライアント JS
-├── index.php                ... タイムライン
-├── post.php                 ... 投稿ページ
-├── profile.php              ... プロフィール（タブ式）
-├── login.php                ... ログイン
-├── register.php             ... 新規登録
-└── logout.php               ... ログアウト
-```
-
-各ファイルの詳しい役割、読む順番、処理の追い方は [CODE_WALKTHROUGH.md](./CODE_WALKTHROUGH.md) にまとめています。
-
----
-
-### Ajax アーキテクチャ
-
-共鳴・返信・フォローは画面遷移なしで動作するため、Vanilla JS から PHP API を呼び出す構成にしています。
+## 構成
 
 ```text
-Browser                                          Server
-┌─────────────────┐                             ┌────────────────────┐
-│ index.php       │                             │ api/resonate.php   │
-│ ├─ 共鳴ボタン      │  ─── fetch (POST) ────→  │ ├─ CSRF検証          │
-│ ├─ 返信フォーム     │                             │ ├─ 共鳴の有無を判定    │
-│ └─ フォローボタン    │                             │ ├─ INSERT / DELETE  │
-│                  │  ←── JSON response ────  │ └─ 件数を返す          │
-│   public/js/    │                             │                     │
-│   app.js が     │                             │ DB: SQLite          │
-│   結果で UI 更新  │                             │ resonances テーブル  │
-└─────────────────┘                             └────────────────────┘
+ブラウザ → 127.0.0.1:8080 → Docker → Apache → PHP → SQLite
+                                                    └→ pulse-data volume
 ```
 
-ページ全体のリロードなしでカウンタとボタン状態が更新されるため、SNS らしい応答性を実現しています。
+詳しい役割は [構成を理解する](docs/01-architecture.md) で、図と確認問題を使って学べます。
 
----
+## 最短の起動手順
 
-## 起動方法
+必要なものはGit、Docker Engine、Docker Compose v2、`curl`です。バージョンは構築証跡へ記録し、実際の環境で動作確認します。
+
+WindowsではDocker DesktopのWSL 2 backendとLinux containersを想定します。`docker version` にClientだけでなくServerも表示されることを確認してください。
 
 ```bash
 git clone https://github.com/ns7jp/pulse.git
 cd pulse
-php -S localhost:8000
+docker compose config
+docker compose up -d --build
+sh scripts/smoke-test.sh
 ```
 
-ブラウザで `http://localhost:8000` を開き、新規登録するとすぐに利用開始できます。
-データベースは初回アクセス時に自動で作成されます（外部 DB 不要）。
+Windows PowerShellでは、最後の行を `powershell -ExecutionPolicy Bypass -File scripts/smoke-test.ps1` に置き換えます。
 
-**動作要件**: PHP 8.x 以上（PDO SQLite 拡張モジュールが有効であること）
-
----
-
-## トラブルシューティング（利用者向け）
-
-### Q. `php` コマンドが見つかりません
-
-PHP 8.x がインストールされていない、または PATH が通っていません。
-
-- **Windows**：[XAMPP](https://www.apachefriends.org/jp/index.html) をインストールするか、[php.net](https://windows.php.net/) から ZIP を取得して PATH に追加。
-- **macOS**：`brew install php` で導入可。
-- **Linux (Ubuntu)**：`sudo apt install php php-sqlite3`
-
-### Q. 起動時に `could not find driver` のエラー
-
-PDO SQLite 拡張モジュールが無効です。`php -m | grep sqlite` で確認できます。
-
-- Linux：`sudo apt install php-sqlite3` で追加可。
-- XAMPP：`php.ini` の `;extension=pdo_sqlite` の `;` を外して再起動。
-
-### Q. `localhost:8000` が「すでに使用中」と言われる
-
-別のプロセスがポート 8000 を使用しています。
+ブラウザで <http://127.0.0.1:8080> を開きます。停止は次のコマンドです。
 
 ```bash
-# 別ポートで起動
-php -S localhost:8080
+docker compose down
 ```
 
-### Q. アクセスすると真っ白／500エラー
+`down` だけならDB volumeは残ります。`down -v` はDBも削除するため、学習手順では実行しません。
 
-初回アクセス時に SQLite データベースの自動作成で失敗している可能性があります。
+Dockerを使わない場合はPHP 8.x、PDO SQLite、mbstringを用意し、`php -S 127.0.0.1:8000 router.php` で起動できます。`router.php` はDBや設定ファイルへの直接アクセスを拒否します。ただしこの方法は簡易開発サーバーであり、本番運用向けではありません。
 
-- `pulse/` フォルダの**書き込み権限**を確認（DB ファイルが作られる場所）。
-- PHP のエラーログを `php -S localhost:8000` のターミナル出力で確認。
+## 完了確認
 
-### Q. 新規登録できるが、ログインで弾かれる
+「画面が見えた」だけで完了にせず、層ごとに確認します。
 
-セッションクッキーが正しく保存されていない可能性。
+```bash
+docker compose ps
+curl --fail http://127.0.0.1:8080/health.php
+docker compose logs --tail=50 pulse
+sh scripts/smoke-test.sh
+```
 
-- ブラウザのプライバシー設定で `localhost` のクッキーが許可されているか確認。
-- シークレットモードを終了して通常タブで試す。
+Windows PowerShellの疎通確認は `powershell -ExecutionPolicy Bypass -File scripts/smoke-test.ps1` です。
 
----
+期待結果:
 
-## セキュリティ実装
+- コンテナが `running` または `healthy`
+- health APIがHTTP 200と `"status":"ok"` を返す
+- smoke testが `PASS` を返す
+- DBの直接取得が403で拒否され、`X-Powered-By`ヘッダーが出ない
+- Apacheログに連続した500エラーがない
 
-学習目的の作品ですが、Web アプリケーションのセキュリティ基礎を意識して実装しています。
+画面では、テスト用の情報で新規登録 → 投稿 → 共鳴 → ログアウトを確認します。実在するパスワードやメールアドレスは使用しません。
 
-| 対策 | 実装内容 | 該当ファイル |
-|------|--------|------------|
-| **SQLインジェクション** | PDO + プリペアドステートメント（`prepare()` / `execute()`） | `config/database.php`, 各 `*.php` |
-| **XSS（クロスサイトスクリプティング）** | `htmlspecialchars($str, ENT_QUOTES, 'UTF-8')` を `h()` 関数でラップし全出力を経由 | `includes/functions.php` |
-| **CSRF（クロスサイトリクエスト偽造）** | `random_bytes(32)` でトークン生成、フォームに埋め込み、`hash_equals()` で**タイミング攻撃対策**込みで検証 | `includes/functions.php` |
-| **パスワード保護** | `password_hash()`（bcrypt）でハッシュ化保存、`password_verify()` で検証 | `register.php`, `login.php` |
-| **セッション管理** | PHP セッションで認証状態を保持。未ログイン時は自動的にログイン画面へリダイレクト | `includes/functions.php` |
-| **権限チェック** | 投稿の編集・削除時にユーザー ID を検証 | 各 API |
-| **エラーハンドリング** | `PDO::ATTR_ERRMODE` を `EXCEPTION` に設定し、エラー時は安全に処理 | `config/database.php` |
+## 初心者向け学習コース
 
----
+| 順番 | 教材 | 身につくこと |
+|---:|---|---|
+| 1 | [構成を理解する](docs/01-architecture.md) | サーバーの部品と通信経路 |
+| 2 | [サーバーを構築する](docs/02-build-guide.md) | 構築、起動、疎通確認、停止 |
+| 3 | [運用手順書](docs/03-operations-runbook.md) | ログ、バックアップ、更新 |
+| 4 | [障害対応の練習](docs/04-troubleshooting.md) | 原因の切り分けと記録 |
+| 5 | [セキュリティ](docs/05-security.md) | 実装済み対策と公開時の不足 |
+| 6 | [構築証跡テンプレート](docs/06-evidence-template.md) | 面接で示せる作業証跡 |
+| 7 | [用語と演習](docs/07-glossary-exercises.md) | 用語の定着と障害対応練習 |
+| 8 | [コード読解ガイド](CODE_WALKTHROUGH.md) | アプリと構成ファイルの処理 |
 
-## デザインの特徴
+覚える順番は **構成 → 構築 → 確認 → 運用 → 障害対応** です。
 
-- **ダークテーマ** を基調に、感情ムードの色がネオンのように光る UI
-- 投稿カードの左ボーダーがムードの色に連動
-- 共鳴ボタン押下時に波紋エフェクトがカード全体に広がるアニメーション
-- 感情オーラの浮遊アニメーションでプロフィールに生命感を演出
-- レスポンシブ対応（モバイル / デスクトップ）
+## SNSアプリの主な機能
 
----
+- 8種類の感情ムードを付けた投稿
+- 「いいね」の代わりとなる共鳴
+- 直近24時間の感情分布
+- 匿名のささやき、予約公開のタイムカプセル
+- 返信、フォロー、プロフィール
 
-## 学んだこと・工夫した点
+アプリはPHP、Vanilla JavaScript、SQLiteで実装しています。DBは初回アクセス時に作成されます。
 
-- **独自仕様の設計**：「いいね」ではなく「共鳴」、感情ムードの可視化など、既存 SNS にはないオリジナル機能を企画から実装まで一貫して担当
-- **DB スキーマ設計**：users / posts / resonances / follows の 4 テーブル構成。外部キー制約・インデックス・カスケード削除を活用
-- **マイグレーション機能**：スキーマ変更時の安全な移行ロジックを実装（`migrateDatabase()`）
-- **セキュリティの基礎習得**：単に「動けば良い」ではなく、本番運用を見据えた対策を実装
-- **JST タイムゾーンの一貫性**：日本時間で揃えるため `date_default_timezone_set('Asia/Tokyo')` を共通関数で適用
+## セキュリティ
 
----
+| 対策 | 実装 |
+|---|---|
+| SQLインジェクション | PDOのプリペアドステートメント |
+| XSS | 出力時のHTMLエスケープ |
+| CSRF | フォームと更新APIでトークン検証 |
+| パスワード | `password_hash()` / `password_verify()` |
+| セッション固定 | ログイン・登録成功時にIDを再生成 |
+| Cookie | HttpOnly、SameSite=Lax、HTTPS時はSecure |
+| ログアウト | POST限定、CSRF検証、Cookie削除 |
+| DBの露出 | Apacheから`data/`へのアクセスを拒否 |
+| コンテナ | 読み取り専用、capability削減、localhost限定公開 |
+
+これはローカル学習環境です。HTTPS、レート制限、監視通知、暗号化した別拠点バックアップ、脆弱性診断の自動化は**未実装**です。バックアップと復元の手順はありますが、この変更環境では**NOT RUN**です。そのままインターネットへ公開しないでください。詳細は [セキュリティと公開時の注意](docs/05-security.md) にあります。
+
+## トラブル時の最初の4コマンド
+
+```bash
+docker compose ps
+curl -v http://127.0.0.1:8080/health.php
+docker compose logs --tail=100 pulse
+docker stats --no-stream
+```
+
+結果を確認してから、[障害対応の練習](docs/04-troubleshooting.md) に沿って原因を切り分けます。用途不明のプロセス停止、`chmod 777`、volume削除を最初の対処にしません。
+
+## 現在の実装・検証状態
+
+| 項目 | リポジトリの状態 | この変更環境での検証 |
+|---|---|---|
+| PHP構文チェック | CIに実装 | NOT RUN（PHP未導入） |
+| Docker build / smoke test | CIに実装 | NOT RUN（Docker未導入） |
+| JavaScript / shell / PowerShell構文・文書リンク | 検査対象 | PASS |
+| バックアップ | スクリプトと手順を実装 | NOT RUN |
+| 復元試験 | 検証環境用手順を作成 | NOT RUN |
+| HTTPS公開 | 未実装 | NOT RUN |
+
+実行した環境では [構築証跡テンプレート](docs/06-evidence-template.md) に結果を記録してください。
+
+ホストへPHPを直接導入した場合は `sh scripts/check.sh` でPHP構文、必須拡張、保存先、DB誤追跡も確認できます。このスクリプトにはPHP、Git、POSIX互換シェルが必要です。
+
+## ディレクトリ
+
+```text
+Dockerfile / compose.yaml   サーバー構成
+docker/                     Apacheの安全設定
+scripts/                    チェック、疎通確認、バックアップ
+docs/                       構築・運用・障害対応の教材
+config/                     SQLite接続とスキーマ
+includes/                   共通PHP処理
+api/                        共鳴・返信・フォローAPI
+public/                     CSSとJavaScript
+*.php                       画面とhealth API
+```
 
 ## 制作背景
 
-公共職業訓練「情報処理（Pythonエンジニア）コース」（ISPアカデミー川越校 / 2025年10月〜2026年1月）の学習成果として制作しました。
-カリキュラムを超えて自主的に追加機能を実装し、ポートフォリオとして公開しています。
+公共職業訓練「情報処理（Pythonエンジニア）コース」の学習成果として始め、サーバー構築・運用を説明できるポートフォリオへ発展させています。
 
----
+著者: 島田則幸（Noriyuki Shimada）
 
-## 今後追加したい機能（TODO）
-
-- [ ] HTTPS 対応（独自ドメイン取得後の本番化）
-- [ ] 画像投稿対応
-- [ ] プッシュ通知（共鳴・返信を受けた時）
-- [ ] ハッシュタグ・全文検索
-- [ ] ミュート / ブロック機能
-- [ ] 投稿の下書き保存
-- [ ] PWA 化してスマホアプリ風に
-
-学習を進めながら順次追加予定です。
-
----
-
-## 著者
-
-**島田則幸（Noriyuki Shimada）**
-
-- 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
-- 📂 [ほかの作品](https://github.com/ns7jp/works)
-- 📧 net7jp@gmail.com
-
----
+[ポートフォリオ](https://ns7jp.github.io/) / [GitHub](https://github.com/ns7jp)
 
 ## ライセンス
 
-このリポジトリのコードは [MIT License](./LICENSE) のもとで公開しています。学習・参考目的でご活用いただけます。
+[MIT License](LICENSE)

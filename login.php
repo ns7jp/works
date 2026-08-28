@@ -22,7 +22,7 @@
  *   4. 下部の HTML フォームと hidden の csrf_token が PHP 処理に対応している点を確認する
  */
 
-session_start();
+require_once __DIR__ . '/includes/session.php';
 require_once __DIR__ . '/includes/functions.php';
 
 $pdo    = getDB();
@@ -33,12 +33,12 @@ $errors = [];   // バリデーションエラーをまとめる配列
 // ----------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF トークン検証（不正なフォームからの送信を弾く）
-    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
+    if (!verifyCSRFToken(postString('csrf_token'))) {
         $errors[] = '不正なリクエストです。';
     } else {
         // 入力値の取り出し（trim で前後の空白を削除）
-        $username = trim($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $username = trim(postString('username'));
+        $password = postString('password');
 
         // ユーザー名で DB を検索（プリペアドステートメント）
         $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //   入力された平文パスワードと、DB に保存された bcrypt ハッシュを照合
         //   マッチすれば true
         if ($user && password_verify($password, $user['password_hash'])) {
+            session_regenerate_id(true);
             // セッションに user_id を保存（これがログイン状態の印）
             $_SESSION['user_id'] = $user['id'];
             header('Location: index.php');
@@ -99,7 +100,7 @@ include __DIR__ . '/includes/header.php';
                     （エラー時にすべて入力し直す手間を省く）
                 -->
                 <input type="text" id="username" name="username" required
-                       value="<?= h($_POST['username'] ?? '') ?>"
+                       value="<?= h(postString('username')) ?>"
                        placeholder="ユーザー名">
             </div>
 

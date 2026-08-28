@@ -10,19 +10,20 @@
  *
  * 【リクエスト形式（JSON）】
  *   POST /api/follow.php
+ *   Header: X-CSRF-Token: <画面のmeta要素にあるトークン>
  *   Body: { "user_id": 12 }    ← フォロー対象のユーザー ID
  *
  * 【レスポンス形式（JSON）】
  *   { "success": true, "following": true|false, "follower_count": 30 }
  *
  * 【初学者向けの読み方】
- *   1. JSON を受け取るために php://input を読んでいる部分を見る
- *   2. 自分自身をフォローできないようにする入力チェックを見る
- *   3. 既にフォロー中なら DELETE、未フォローなら INSERT するトグル処理を見る
- *   4. 最後に JSON を返し、JavaScript がボタン表示を更新する流れを確認する
+ *   1. 認証 → POSTメソッド → CSRFの順で入口を検証する
+ *   2. JSON型、自己フォロー、対象ユーザーの存在を確認する
+ *   3. 既にフォロー中なら DELETE、未フォローなら INSERT する
+ *   4. JSONを返し、JavaScriptがボタン表示を更新する流れを見る
  */
 
-session_start();
+require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 
 header('Content-Type: application/json');
@@ -41,9 +42,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+if (!verifyCSRFToken($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
+    http_response_code(403);
+    echo json_encode(['error' => 'CSRF トークンが無効です']);
+    exit;
+}
+
 $pdo      = getDB();
-$data     = json_decode(file_get_contents('php://input'), true);
-$targetId = (int)($data['user_id'] ?? 0);
+$data = json_decode(file_get_contents('php://input'), true);
+if (!is_array($data) || !is_int($data['user_id'] ?? null)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'JSON形式のユーザーIDが必要です']);
+    exit;
+}
+$targetId = $data['user_id'];
 $userId   = $_SESSION['user_id'];
 
 // バリデーション:

@@ -1270,3 +1270,6 @@ textarea { resize: vertical; font-family: inherit; }
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
 }
+/* POST 送信のログアウトボタンを通常のナビリンクと同じ見た目にする */
+.nav-logout-form { display: inline; margin: 0; }
+.nav-link-button { background: none; border: 0; cursor: pointer; font: inherit; }

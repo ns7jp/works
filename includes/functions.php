@@ -86,6 +86,21 @@ function h(string $str): string {
 }
 
 /**
+ * POST値を文字列として安全に取得する。
+ * `field[]=value` のような配列が送られてもTypeErrorにせず既定値へ戻す。
+ */
+function postString(string $key, string $default = ''): string {
+    $value = $_POST[$key] ?? $default;
+    return is_string($value) ? $value : $default;
+}
+
+/** GET値を文字列として安全に取得する。 */
+function queryString(string $key, string $default = ''): string {
+    $value = $_GET[$key] ?? $default;
+    return is_string($value) ? $value : $default;
+}
+
+/**
  * CSRF トークンを生成（既にあれば再利用）
  *
  * CSRF（Cross-Site Request Forgery）対策の流れ:

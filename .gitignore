@@ -1,0 +1,10 @@
+/data/
+/backups/
+/.env
+/.env.*
+/.idea/
+/.vscode/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

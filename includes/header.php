@@ -33,6 +33,9 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
     <meta charset="UTF-8">
     <!-- スマホでも適切に表示されるよう、ビューポートを端末幅に合わせる -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php if (isLoggedIn()): ?>
+        <meta name="csrf-token" content="<?= h(generateCSRFToken()) ?>">
+    <?php endif; ?>
     <title>Pulse - 感情共鳴型SNS</title>
     <!-- 共通スタイルシート（ダークテーマ＋ネオン UI） -->
     <link rel="stylesheet" href="public/css/style.css">
@@ -61,11 +64,14 @@ $currentPage = basename($_SERVER['PHP_SELF'], '.php');
                        class="nav-link <?= $currentPage === 'profile' ? 'active' : '' ?>">
                         <span class="avatar-sm" style="background:<?= h($currentUser['avatar_color']) ?>">
                             <?php /* 表示名の先頭1文字をアバター内に表示（mb_substr はマルチバイト安全） */ ?>
-                            <?= mb_substr($currentUser['display_name'], 0, 1) ?>
+                            <?= h(mb_substr($currentUser['display_name'], 0, 1)) ?>
                         </span>
                     </a>
 
-                    <a href="logout.php" class="nav-link">ログアウト</a>
+                    <form method="POST" action="logout.php" class="nav-logout-form">
+                        <input type="hidden" name="csrf_token" value="<?= h(generateCSRFToken()) ?>">
+                        <button type="submit" class="nav-link nav-link-button">ログアウト</button>
+                    </form>
                 <?php else: ?>
                     <!-- ===== 未ログイン時の表示 ===== -->
                     <a href="login.php" class="nav-link">ログイン</a>

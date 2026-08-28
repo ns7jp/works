@@ -28,7 +28,7 @@
  *   4. 登録成功後にセッションへ user_id を保存し、自動ログインしている点を確認する
  */
 
-session_start();
+require_once __DIR__ . '/includes/session.php';
 require_once __DIR__ . '/includes/functions.php';
 
 $pdo    = getDB();
@@ -39,15 +39,15 @@ $errors = [];
 // ----------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF トークン検証
-    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
+    if (!verifyCSRFToken(postString('csrf_token'))) {
         $errors[] = '不正なリクエストです。';
     } else {
         // 入力値の取り出し
-        $username        = trim($_POST['username'] ?? '');
-        $displayName     = trim($_POST['display_name'] ?? '');
-        $email           = trim($_POST['email'] ?? '');
-        $password        = $_POST['password'] ?? '';
-        $passwordConfirm = $_POST['password_confirm'] ?? '';
+        $username        = trim(postString('username'));
+        $displayName     = trim(postString('display_name'));
+        $email           = trim(postString('email'));
+        $password        = postString('password');
+        $passwordConfirm = postString('password_confirm');
 
         // ----- 各フィールドのバリデーション（複数のエラーをまとめて表示） -----
 
@@ -108,7 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // 登録直後にログイン状態にしてしまう（=自動ログイン）
             //   lastInsertId(): 直前の INSERT で採番された主キーを取得
-            $_SESSION['user_id'] = $pdo->lastInsertId();
+            session_regenerate_id(true);
+            $_SESSION['user_id'] = (int)$pdo->lastInsertId();
             header('Location: index.php');
             exit;
         }
@@ -147,7 +148,7 @@ include __DIR__ . '/includes/header.php';
                 -->
                 <input type="text" id="username" name="username" required
                        pattern="[a-zA-Z0-9_]+" minlength="3" maxlength="20"
-                       value="<?= h($_POST['username'] ?? '') ?>"
+                       value="<?= h(postString('username')) ?>"
                        placeholder="pulse_user">
             </div>
 
@@ -155,7 +156,7 @@ include __DIR__ . '/includes/header.php';
                 <label for="display_name">表示名</label>
                 <input type="text" id="display_name" name="display_name" required
                        maxlength="30"
-                       value="<?= h($_POST['display_name'] ?? '') ?>"
+                       value="<?= h(postString('display_name')) ?>"
                        placeholder="パルス太郎">
             </div>
 
@@ -163,7 +164,7 @@ include __DIR__ . '/includes/header.php';
                 <label for="email">メールアドレス</label>
                 <!-- type="email": ブラウザがメール形式かを簡易チェックしてくれる -->
                 <input type="email" id="email" name="email" required
-                       value="<?= h($_POST['email'] ?? '') ?>"
+                       value="<?= h(postString('email')) ?>"
                        placeholder="you@example.com">
             </div>
 

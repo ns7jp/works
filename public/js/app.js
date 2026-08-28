@@ -20,6 +20,17 @@
  *   4. DOMContentLoaded の中で、ページ読み込み後にイベントを設定する流れを確認する
  */
 
+function csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content || '';
+}
+
+function jsonHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken(),
+    };
+}
+
 // =====================================================
 //  共鳴ボタンのトグル（ON ⇄ OFF）
 //
@@ -41,7 +52,7 @@ async function toggleResonate(btn) {
         // fetch でサーバーに POST リクエスト
         const res = await fetch('api/resonate.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonHeaders(),
             body: JSON.stringify({ post_id: parseInt(postId) }),
         });
 
@@ -80,7 +91,7 @@ async function toggleFollow(btn) {
     try {
         const res = await fetch('api/follow.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonHeaders(),
             body: JSON.stringify({ user_id: parseInt(userId) }),
         });
 
@@ -194,7 +205,7 @@ async function submitReply(btn, parentId) {
     try {
         const res = await fetch('api/reply.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: jsonHeaders(),
             body: JSON.stringify({
                 parent_id: parentId,
                 content:   content,
