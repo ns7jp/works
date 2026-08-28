@@ -2,6 +2,8 @@
 
 このドキュメントは、Pulse の各ファイルが「何を担当しているか」「どの順番で読むと理解しやすいか」を初学者向けに整理したものです。コード内にもコメントを入れていますが、最初はこのガイドで全体像をつかんでから各ファイルを読むと迷いにくくなります。
 
+> サーバー構築から学ぶ場合は、先に [docs/01-architecture.md](docs/01-architecture.md) から [docs/07-glossary-exercises.md](docs/07-glossary-exercises.md) までを順番に進めてください。このガイドは、その後にアプリ内部を読むための教材です。
+
 ---
 
 ## 1. 全体像
@@ -99,6 +101,18 @@ SQLite データベースへの接続と、初回起動時のテーブル作成�
 
 ---
 
+### `includes/session.php`
+
+セッションCookieの安全属性を設定してから、セッションを開始します。
+
+初学者が見るポイント:
+- Cookie設定は `session_start()` より前に行う
+- HttpOnlyはJavaScriptからのCookie読み取りを防ぐ
+- SameSiteは別サイトを起点にした送信を制限する
+- ログイン成功時の `session_regenerate_id(true)` と組み合わせて使う
+
+---
+
 ### `includes/header.php`
 
 各ページ共通の HTML 上部とナビゲーションバーを出力します。
@@ -174,10 +188,11 @@ SQLite データベースへの接続と、初回起動時のテーブル作成�
 ログアウト処理だけを担当する小さなファイルです。
 
 主な処理:
-- `session_start()` で現在のセッションを開く
+- `includes/session.php` で安全属性を付けて現在のセッションを開く
+- POSTメソッドとCSRFトークンを検証する
 - `$_SESSION = []` でセッション変数を空にする
 - `session_destroy()` でサーバー側のセッションを破棄する
-- `login.php` にリダイレクトする
+- セッションCookieも削除し、`login.php` にリダイレクトする
 
 初学者が見るポイント:
 - ログアウトは「画面を表示する処理」ではなく「状態を消して移動する処理」
@@ -248,6 +263,7 @@ SQLite データベースへの接続と、初回起動時のテーブル作成�
 共鳴ボタンの Ajax API です。
 
 主な処理:
+- 認証、POSTメソッド、CSRFトークン、JSON型を順に検証する
 - JSON のリクエストから `post_id` を受け取る
 - ログインしているか確認する
 - 対象投稿が存在するか確認する
@@ -267,6 +283,7 @@ SQLite データベースへの接続と、初回起動時のテーブル作成�
 フォローボタンの Ajax API です。
 
 主な処理:
+- 認証、POSTメソッド、CSRFトークン、JSON型を順に検証する
 - JSON のリクエストから `user_id` を受け取る
 - 自分自身をフォローしようとしていないか確認する
 - 対象ユーザーが存在するか確認する
@@ -285,6 +302,7 @@ SQLite データベースへの接続と、初回起動時のテーブル作成�
 返信の取得と作成を担当する Ajax API です。
 
 主な処理:
+- 認証後、GETでは公開可否、POSTではCSRFとJSON型も検証する
 - GET リクエストでは指定投稿への返信一覧を HTML 文字列として返す
 - POST リクエストでは新しい返信を `posts` テーブルに追加する
 - 返信の本文、ムード、親投稿 ID を検証する
@@ -380,7 +398,7 @@ index.php のタイムラインに表示
 index.php / profile.php の共鳴ボタン
   ↓ onclick="toggleResonate(this)"
 public/js/app.js
-  ↓ fetch('/api/resonate.php')
+  ↓ fetch('api/resonate.php')
 api/resonate.php
   ↓ resonances テーブルを追加または削除
 JSON を返す
@@ -412,3 +430,53 @@ posts テーブルに parent_id 付きで INSERT
 - フォーム送信では CSRF トークンを確認する
 - JavaScript は「画面の一部だけを更新する」処理に使っている
 - CSS は見た目だけでなく、状態変化やアニメーションも担当している
+
+---
+
+## 6. サーバー構成ファイルの読み方
+
+### `Dockerfile`
+
+PHP 8.2 + Apacheのimageを土台に、SQLiteとmbstringを追加し、アプリだけをimageへコピーします。最後の `HEALTHCHECK` は、HTTPとDB接続を定期確認します。
+
+読む順番:
+1. `FROM` で土台を確認
+2. `RUN` で追加パッケージとApache設定を確認
+3. `COPY` で公開対象を確認
+4. `HEALTHCHECK` で正常条件を確認
+
+### `compose.yaml`
+
+imageのbuild、8080番ポート、DB volume、再起動方針、読み取り専用化、Linux capabilityを定義します。Dockerfileが「imageの作り方」、Composeが「実行時の接続と設定」です。
+
+### `docker/apache-security.conf`
+
+Apacheのバージョン情報を抑え、DBディレクトリへのHTTPアクセスを拒否し、基本的なレスポンスヘッダーを付けます。
+
+### `health.php` とsmoke test
+
+`health.php` はSQLiteへ `SELECT 1` を実行し、成功時200、失敗時503を返します。healthcheckは1つの正常性を継続確認し、smoke testはhealthとログイン画面という複数の入口を構築後に確認します。
+
+### `scripts/backup.*`
+
+SQLiteの `VACUUM INTO` で整合したバックアップを作り、SHA-256を記録します。Linux/macOS向け `.sh` とWindows PowerShell向け `.ps1` は同じ目的を別のシェルで実装しています。
+
+### `.github/workflows/php-check.yml`
+
+commitごとにPHP構文、Compose設定、image build、起動、smoke testを自動確認します。失敗時はログを表示し、最後に検証用volumeを含む環境を片付けます。CIの成功はCI環境での結果であり、自分のPCや本番環境での成功とは区別します。
+
+## 7. サーバー側を追うおすすめ順
+
+```text
+compose.yaml
+  ↓ build指定
+Dockerfile
+  ↓ Apache設定を配置
+docker/apache-security.conf
+  ↓ アプリを起動
+health.php
+  ↓ 完了確認
+scripts/smoke-test.sh または scripts/smoke-test.ps1
+  ↓ 継続的に自動確認
+.github/workflows/php-check.yml
+```

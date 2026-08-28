@@ -48,7 +48,9 @@ function getDB(): PDO {
     // ---- 1. data/ ディレクトリが無ければ作る ----
     $dir = dirname(DB_PATH);            // dirname() で「ディレクトリ部分」だけを抽出
     if (!is_dir($dir)) {                // is_dir() でフォルダ存在チェック
-        mkdir($dir, 0777, true);        // 第3引数 true で親ディレクトリも再帰的に作成
+        if (!mkdir($dir, 0750, true) && !is_dir($dir)) {
+            throw new RuntimeException('データ保存用ディレクトリを作成できません。');
+        }
     }
 
     // ---- 2. DB ファイルがまだ無いかどうかを判定（後で初期化処理に使う）----

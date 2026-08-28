@@ -23,7 +23,7 @@
  *   4. フォローボタンが public/js/app.js と api/follow.php へつながる点を確認する
  */
 
-session_start();
+require_once __DIR__ . '/includes/session.php';
 require_once __DIR__ . '/includes/functions.php';
 
 $pdo = getDB();
@@ -33,7 +33,8 @@ $currentUser = getCurrentUser($pdo);
 
 // 表示対象のユーザー ID（指定がなければ自分）
 //   (int) でキャストすることで SQL に渡しても安全
-$profileId = (int)($_GET['id'] ?? $currentUser['id']);
+$rawProfileId = queryString('id', (string)$currentUser['id']);
+$profileId = ctype_digit($rawProfileId) ? (int)$rawProfileId : (int)$currentUser['id'];
 
 // 対象ユーザー情報を取得
 $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
@@ -57,7 +58,7 @@ $now     = nowJST();
 $weekAgo = date('Y-m-d H:i:s', strtotime('-7 days'));
 
 // アクティブなタブを決定（不正値が来ても 'posts' にフォールバック）
-$tab = $_GET['tab'] ?? 'posts';
+$tab = queryString('tab', 'posts');
 if (!in_array($tab, ['posts', 'followers', 'following'], true)) {
     $tab = 'posts';
 }
@@ -71,17 +72,24 @@ $stmt = $pdo->prepare("
     SELECT mood, COUNT(*) as cnt
     FROM posts
     WHERE user_id = ? AND created_at > ?
+      AND is_whisper = 0
+      AND parent_id IS NULL
+      AND (is_timecapsule = 0 OR reveal_at <= ?)
     GROUP BY mood
     ORDER BY cnt DESC
     LIMIT 3
 ");
-$stmt->execute([$profileUser['id'], $weekAgo]);
+$stmt->execute([$profileUser['id'], $weekAgo, $now]);
 $aura = $stmt->fetchAll();
 $moods = getMoods();
 
 // 投稿総数（返信を除いた通常投稿のみ）
-$stmt = $pdo->prepare('SELECT COUNT(*) FROM posts WHERE user_id = ? AND parent_id IS NULL');
-$stmt->execute([$profileUser['id']]);
+$stmt = $pdo->prepare('
+    SELECT COUNT(*) FROM posts
+    WHERE user_id = ? AND parent_id IS NULL AND is_whisper = 0
+      AND (is_timecapsule = 0 OR reveal_at <= ?)
+');
+$stmt->execute([$profileUser['id'], $now]);
 $postCount = (int)$stmt->fetchColumn();
 
 // =====================================================
@@ -126,7 +134,7 @@ include __DIR__ . '/includes/header.php';
     <div class="profile-header">
         <!-- アバター（背景色 = ユーザーごとのテーマ色） -->
         <div class="profile-avatar" style="background:<?= h($profileUser['avatar_color']) ?>">
-            <?= mb_substr($profileUser['display_name'], 0, 1) ?>
+            <?= h(mb_substr($profileUser['display_name'], 0, 1)) ?>
         </div>
         <div class="profile-info">
             <h1 class="profile-name"><?= h($profileUser['display_name']) ?></h1>
@@ -282,7 +290,7 @@ include __DIR__ . '/includes/header.php';
                     <div class="user-card">
                         <a href="profile.php?id=<?= $user['id'] ?>" class="user-card-avatar"
                            style="background:<?= h($user['avatar_color']) ?>">
-                            <?= mb_substr($user['display_name'], 0, 1) ?>
+                            <?= h(mb_substr($user['display_name'], 0, 1)) ?>
                         </a>
                         <div class="user-card-info">
                             <a href="profile.php?id=<?= $user['id'] ?>" class="user-card-name">
@@ -329,7 +337,7 @@ include __DIR__ . '/includes/header.php';
                     <div class="user-card">
                         <a href="profile.php?id=<?= $user['id'] ?>" class="user-card-avatar"
                            style="background:<?= h($user['avatar_color']) ?>">
-                            <?= mb_substr($user['display_name'], 0, 1) ?>
+                            <?= h(mb_substr($user['display_name'], 0, 1)) ?>
                         </a>
                         <div class="user-card-info">
                             <a href="profile.php?id=<?= $user['id'] ?>" class="user-card-name">

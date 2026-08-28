@@ -10,6 +10,7 @@
  *
  * 【リクエスト形式（JSON）】
  *   POST /api/resonate.php
+ *   Header: X-CSRF-Token: <画面のmeta要素にあるトークン>
  *   Body: { "post_id": 123 }
  *
  * 【レスポンス形式（JSON）】
@@ -18,13 +19,13 @@
  *     count     … 操作後の合計共鳴数
  *
  * 【初学者向けの読み方】
- *   1. post_id を JSON から受け取り、対象投稿が存在するか確認する
- *   2. resonances テーブルに既存行があるか SELECT で調べる
- *   3. あれば DELETE、なければ INSERT するトグル処理を見る
- *   4. 最新件数を JSON で返し、JavaScript 側の表示更新につながる点を確認する
+ *   1. 認証 → POSTメソッド → CSRFの順で入口を検証する
+ *   2. post_id のJSON型と、対象投稿が公開済みかを確認する
+ *   3. resonances テーブルに既存行があるか SELECT で調べる
+ *   4. あれば DELETE、なければ INSERTし、最新件数をJSONで返す
  */
 
-session_start();
+require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 
 // このファイルは JSON を返すという宣言（ブラウザの fetch が json() で扱える）
@@ -44,13 +45,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+if (!verifyCSRFToken($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
+    http_response_code(403);
+    echo json_encode(['error' => 'CSRF トークンが無効です']);
+    exit;
+}
+
 $pdo = getDB();
 
 // JSON 形式のリクエストボディをパース
 //   php://input は「生の HTTP リクエストボディ」を読める疑似ファイル
 //   json_decode($json, true) の第2引数 true で連想配列として受け取る
-$data   = json_decode(file_get_contents('php://input'), true);
-$postId = (int)($data['post_id'] ?? 0);
+$data = json_decode(file_get_contents('php://input'), true);
+if (!is_array($data) || !is_int($data['post_id'] ?? null)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'JSON形式の投稿IDが必要です']);
+    exit;
+}
+$postId = $data['post_id'];
 $userId = $_SESSION['user_id'];
 
 // 不正な ID（0 以下）は弾く
@@ -61,8 +73,20 @@ if ($postId <= 0) {
 }
 
 // 投稿の存在確認 + ムード取得（resonances.emotion に保存するために必要）
-$stmt = $pdo->prepare('SELECT id, mood FROM posts WHERE id = ?');
-$stmt->execute([$postId]);
+$stmt = $pdo->prepare('
+    SELECT p.id, p.mood
+    FROM posts p
+    LEFT JOIN posts parent ON p.parent_id = parent.id
+    WHERE p.id = ?
+      AND (
+        (p.parent_id IS NULL AND (p.is_timecapsule = 0 OR p.reveal_at <= ?))
+        OR
+        (p.parent_id IS NOT NULL AND parent.parent_id IS NULL
+         AND (parent.is_timecapsule = 0 OR parent.reveal_at <= ?))
+      )
+');
+$now = nowJST();
+$stmt->execute([$postId, $now, $now]);
 $post = $stmt->fetch();
 
 if (!$post) {

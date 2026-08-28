@@ -20,7 +20,7 @@
  */
 
 // セッション機能を開始（ログイン状態の維持に必須・他のあらゆる処理の前に呼ぶ）
-session_start();
+require_once __DIR__ . '/includes/session.php';
 
 // 共通関数を読み込む（getDB, isLoggedIn, h, getMoods など）
 require_once __DIR__ . '/includes/functions.php';
@@ -37,9 +37,8 @@ if (!isLoggedIn()) {
 // 現在のユーザー情報を取得（共鳴済み判定や header 表示に使う）
 $currentUser = getCurrentUser($pdo);
 
-// URL の ?mood=xxx を取得（無い場合は空文字）
-//   ??: PHP 7+ の null 合体演算子（左が null ならば右を採用）
-$moodFilter = $_GET['mood'] ?? '';
+// URL の ?mood=xxx を文字列として取得（無い場合や配列なら空文字）
+$moodFilter = queryString('mood');
 $moods = getMoods();
 
 // 現在の日本時間（タイムカプセル公開判定に使う）
@@ -184,7 +183,7 @@ include __DIR__ . '/includes/header.php';
                         <!-- 通常投稿: 投稿者プロフィールへリンク -->
                         <a href="profile.php?id=<?= $post['user_id'] ?>" class="avatar-sm"
                            style="background:<?= h($post['avatar_color']) ?>">
-                            <?= mb_substr($post['display_name'], 0, 1) ?>
+                            <?= h(mb_substr($post['display_name'], 0, 1)) ?>
                         </a>
                         <div class="post-meta">
                             <a href="profile.php?id=<?= $post['user_id'] ?>" class="post-author">

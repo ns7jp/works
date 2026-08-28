@@ -24,7 +24,7 @@
  *   4. エラーがなければ posts テーブルへ INSERT する、という順番で追う
  */
 
-session_start();
+require_once __DIR__ . '/includes/session.php';
 require_once __DIR__ . '/includes/functions.php';
 
 $pdo = getDB();
@@ -39,12 +39,12 @@ $success     = false;   // 投稿成功時に true → 完了メッセージ表�
 //  POST 受信時: 投稿処理
 // ----------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verifyCSRFToken($_POST['csrf_token'] ?? '')) {
+    if (!verifyCSRFToken(postString('csrf_token'))) {
         $errors[] = '不正なリクエストです。';
     } else {
         // 入力値の取得
-        $content       = trim($_POST['content'] ?? '');
-        $mood          = $_POST['mood'] ?? '';
+        $content       = trim(postString('content'));
+        $mood          = postString('mood');
         // チェックボックスは「ON のとき "1"、OFF のとき送信されない」
         //   → !empty() で判定して 1 or 0 にそろえる
         $isWhisper     = !empty($_POST['is_whisper']) ? 1 : 0;
@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // タイムカプセルが ON の場合、公開日時の検証
         if ($isTimecapsule) {
-            $revealDate = $_POST['reveal_date'] ?? '';
-            $revealTime = $_POST['reveal_time'] ?? '12:00';
+            $revealDate = postString('reveal_date');
+            $revealTime = postString('reveal_time', '12:00');
             if (empty($revealDate)) {
                 $errors[] = 'タイムカプセルの公開日を指定してください。';
             } else {
@@ -79,10 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // バリデーションを通ったら DB へ INSERT
         if (empty($errors)) {
-            // parent_id が POST に含まれていれば「返信投稿」として扱う
-            //   現状この画面からは送られないが、API 側との互換のため対応
-            $parentId = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
-
             $stmt = $pdo->prepare('
                 INSERT INTO posts (user_id, parent_id, content, mood,
                                    is_whisper, is_timecapsule, reveal_at, created_at)
@@ -90,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ');
             $stmt->execute([
                 $currentUser['id'],
-                $parentId,
+                null, // この画面は通常投稿専用。返信は検証付きAPIで処理する
                 $content,
                 $mood,
                 $isWhisper,
@@ -142,7 +138,7 @@ include __DIR__ . '/includes/header.php';
                     -->
                     <label class="mood-option" style="--mood-color:<?= $mood['color'] ?>">
                         <input type="radio" name="mood" value="<?= $key ?>"
-                               <?= ($_POST['mood'] ?? '') === $key ? 'checked' : '' ?> required>
+                               <?= postString('mood') === $key ? 'checked' : '' ?> required>
                         <span class="mood-option-inner">
                             <span class="mood-emoji"><?= $mood['emoji'] ?></span>
                             <span class="mood-label"><?= $mood['label'] ?></span>
@@ -156,7 +152,7 @@ include __DIR__ . '/includes/header.php';
         <div class="form-group">
             <label for="content">メッセージ</label>
             <textarea id="content" name="content" rows="4" maxlength="500" required
-                      placeholder="今、何を感じていますか？"><?= h($_POST['content'] ?? '') ?></textarea>
+                      placeholder="今、何を感じていますか？"><?= h(postString('content')) ?></textarea>
             <!-- 文字数カウンター（JS が #charCount を更新） -->
             <div class="char-count"><span id="charCount">0</span>/500</div>
         </div>
@@ -187,13 +183,13 @@ include __DIR__ . '/includes/header.php';
                             date('Y-m-d', strtotime('+1 day'))  → 翌日の YYYY-MM-DD
                         -->
                         <input type="date" id="reveal_date" name="reveal_date"
-                               value="<?= h($_POST['reveal_date'] ?? '') ?>"
+                               value="<?= h(postString('reveal_date')) ?>"
                                min="<?= date('Y-m-d', strtotime('+1 day')) ?>">
                     </div>
                     <div class="form-group">
                         <label for="reveal_time">公開時刻</label>
                         <input type="time" id="reveal_time" name="reveal_time"
-                               value="<?= h($_POST['reveal_time'] ?? '12:00') ?>">
+                               value="<?= h(postString('reveal_time', '12:00')) ?>">
                     </div>
                 </div>
             </div>
