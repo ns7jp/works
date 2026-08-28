@@ -18,3 +18,6 @@ jobs:
 
       - name: Compile Python files
         run: python -m compileall teikei_kanri.py sticky_notes.py
+
+      - name: Check Markdown local links
+        run: python scripts/check_docs.py

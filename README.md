@@ -1,14 +1,15 @@
-# Works — ポートフォリオ作品集
+# Works — サーバー構築エンジニアを目指すポートフォリオ
 
-**島田則幸（Noriyuki Shimada）** が公共職業訓練（ISPアカデミー川越校 / 2025年10月〜2026年1月）の学習成果として制作した Web アプリ・デスクトップアプリ・運用支援ツール集です。
+**島田則幸（Noriyuki Shimada）** が、未経験からサーバー構築・運用に必要な力を身につける過程をまとめたポートフォリオです。公共職業訓練（ISPアカデミー川越校 / 2025年10月〜2026年1月）で制作した6作品を、次の3つの視点で説明します。
 
-Web アプリの基本である「画面から入力する → サーバーで処理する → データベースへ保存する → 画面に表示する」という流れから、Python GUI、静的サイト、サーバー監視まで、学習段階ごとの理解を形にした作品をまとめています。
+- **構築**：アプリや必要な部品を組み合わせ、動く環境を作る
+- **確認**：コマンドや画面で、想定どおり動くことを確かめる
+- **運用**：異常の発見、原因の切り分け、安全な復旧を考える
 
-> 📌 **このリポジトリの位置づけ**
-> - **コード本体が含まれるもの**：定型文管理アプリ（[`teikei_kanri.py`](./teikei_kanri.py)）、付箋アプリ（[`sticky_notes.py`](./sticky_notes.py)）
-> - **解説のみ掲載しているもの**：SNSアプリ Pulse、掲示板、サンプル企業サイト、サーバー監視ダッシュボード（各々のソースコードは別リポジトリ）
->
-> 全6作品をひとつのドキュメントから辿れる「ポートフォリオの索引」を兼ねています。
+現在の中心作品は [サーバー監視ダッシュボード](#⑥-サーバー監視ダッシュボードpython--flask--psutil--chartjs) です。Web アプリ作品では、サーバーが入力を受け取り、データベースへ保存し、結果を返す仕組みを学びました。デスクトップ作品では、運用担当者が使う小さな業務支援ツールを Python で作りました。
+
+> [!IMPORTANT]
+> このリポジトリは学習成果の索引です。`teikei_kanri.py` と `sticky_notes.py` はこのリポジトリにコードがあります。ほかの4作品はリンク先の別リポジトリにコードがあります。実機・クラウド・本番環境での構築を、この README だけで実施済みとは扱いません。
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white)
@@ -25,16 +26,48 @@ Web アプリの基本である「画面から入力する → サーバーで�
 
 ---
 
+## 3分で分かるポイント
+
+採用担当者・初めて読む方は、次の順番で確認できます。
+
+1. 下の「身につけた力と証拠」で、学習内容と確認先を見る
+2. [サーバー監視ダッシュボード](#⑥-サーバー監視ダッシュボードpython--flask--psutil--chartjs) で、監視の仕組みを見る
+3. [初学者向け学習ガイド](./docs/server-engineer-guide.md) で、用語と学習順を見る
+4. [確認記録テンプレート](./docs/verification-record.md) で、作業を証拠として残す方法を見る
+
+### 身につけた力と証拠
+
+| 力 | このポートフォリオでの証拠 | 現在の範囲 |
+|---|---|---|
+| Python | GUIアプリ2本、監視データ取得 | コード・解説あり |
+| Web / API | Flask、PHP、JSON API、Fetch API | 別リポジトリにコードあり |
+| データベース | SQLite / MySQL の登録・検索・更新・削除 | 別リポジトリにコードあり |
+| 監視 | CPU・メモリ・ディスク・通信・プロセスの可視化 | ローカル監視アプリあり |
+| セキュリティ基礎 | ハッシュ化、XSS / CSRF / SQLインジェクション対策 | 実装解説あり |
+| 自動確認 | GitHub Actions による Python 構文・文書リンク確認 | CI設定あり。今回の差分はローカル確認済み |
+| Linuxサーバー構築 | 手順化・確認・障害対応の学習 | 学習中。実機構築証跡は今後追加 |
+
+### 覚え方：「作る → 見る → 直す → 残す」
+
+1. **作る**：手順どおりに環境やアプリを用意する
+2. **見る**：サービス、ポート、ログ、CPUなどを確認する
+3. **直す**：影響を確認してから、原因に合った対処をする
+4. **残す**：実行日時、コマンド、結果、判断を記録する
+
+この4語を、サーバー構築・運用の基本サイクルとして使います。具体的な練習方法は [初学者向け学習ガイド](./docs/server-engineer-guide.md) にまとめています。
+
+---
+
 ## 📂 作品一覧
 
-| # | 作品名 | 技術スタック | ライブデモ | ソースコード |
-|---|-------|-----------|---------|----------|
-| ① | SNSアプリ「Pulse」 | PHP / SQLite / JavaScript | [▶ Demo](http://shimada.atwebpages.com/pulse/) | [ns7jp/pulse](https://github.com/ns7jp/pulse) |
-| ② | 掲示板アプリ | PHP / MySQL | [▶ Demo](http://shimada.atwebpages.com/post/) | [ns7jp/post](https://github.com/ns7jp/post) |
-| ③ | 定型文管理アプリ | Python / Flet | デスクトップ | [teikei_kanri.py](./teikei_kanri.py) |
-| ④ | 付箋アプリ | Python / tkinter | デスクトップ | [sticky_notes.py](./sticky_notes.py) |
-| ⑤ | サンプル企業サイト | HTML / CSS / JS / jQuery | [▶ Demo](https://ns7jp.github.io/magic/) | [ns7jp/magic](https://github.com/ns7jp/magic) |
-| ⑥ | サーバー監視ダッシュボード | Python / Flask / psutil / Chart.js | ローカル実行 | [ns7jp/server-monitor](https://github.com/ns7jp/server-monitor) |
+| # | 作品名 | サーバー構築・運用とのつながり | 確認先 |
+|---|---|---|---|
+| ① | SNSアプリ「Pulse」 | Webサーバー、API、SQLite、認証 | [Demo](http://shimada.atwebpages.com/pulse/) / [コード](https://github.com/ns7jp/pulse) |
+| ② | 掲示板アプリ | PHP、MySQL、セッション、CRUD | [Demo](http://shimada.atwebpages.com/post/) / [コード](https://github.com/ns7jp/post) |
+| ③ | 定型文管理アプリ | Python、ファイル操作、業務効率化 | [コード](./teikei_kanri.py) |
+| ④ | 付箋アプリ | Python、JSON、状態保存 | [コード](./sticky_notes.py) |
+| ⑤ | サンプル企業サイト | HTTP、静的配信、ブラウザ表示 | [Demo](https://ns7jp.github.io/magic/) / [コード](https://github.com/ns7jp/magic) |
+| ⑥ | **サーバー監視ダッシュボード** | **OSメトリクス、監視、Flask API、障害の早期発見** | [コード](https://github.com/ns7jp/server-monitor) |
 
 ---
 
@@ -48,7 +81,11 @@ works/
 ├── docs/
 │   ├── teikei_kanri.png  ... 定型文管理アプリのスクリーンショット
 │   ├── sticky_notes.png  ... 付箋アプリのスクリーンショット
-│   └── demo-flow.md      ... デスクトップアプリの操作確認フロー
+│   ├── demo-flow.md      ... デスクトップアプリの操作確認フロー
+│   ├── server-engineer-guide.md ... 初学者向けの用語・演習・障害対応
+│   └── verification-record.md   ... 構築・確認結果の記録テンプレート
+├── scripts/
+│   └── check_docs.py     ... README と docs のローカルリンク確認
 └── template-files/       ... 定型文管理アプリの保存先（自動生成）
 ```
 
