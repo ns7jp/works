@@ -1,0 +1,6 @@
+db.php
+image/*
+!image/.gitkeep
+.env
+.DS_Store
+Thumbs.db
