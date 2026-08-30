@@ -1,0 +1,11 @@
+.git
+.github
+data
+backups
+docs
+scripts
+.env
+.env.*
+README.md
+CODE_WALKTHROUGH.md
+*.log
