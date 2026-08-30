@@ -1,0 +1,1275 @@
+/* ============================================================
+   Pulse - 感情共鳴型SNS
+   ダークテーマ + ネオンアクセント
+   ============================================================
+   このスタイルシートは以下の構成で書かれています:
+     1. 基本変数（カラー・角丸・影）の定義（:root）
+     2. リセット & 全体ベース
+     3. ナビバー / アバター / コンテナ
+     4. ボタン / フォーム / アラート
+     5. 認証ページ
+     6. タイムライン / サイドバー / 投稿カード / 共鳴
+     7. 返信機能
+     8. 投稿フォーム / オプション
+     9. プロフィール / 感情オーラ / ユーザーリスト
+    10. 空状態 / フッター / アニメーション / スクロールバー
+   初学者向けの読み方:
+     - まず :root の変数で、色・影・角丸がどう管理されているかを見る
+     - 次にボタン、フォーム、投稿カードなど、画面部品ごとの塊を読む
+     - 最後に @media とアニメーションを見て、レスポンシブと動きの作り方を確認する
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   :root に CSS カスタムプロパティ（変数）を定義する。
+   var(--bg-primary) のように使い回すことで、
+   テーマカラー変更時に1か所だけ修正すれば済む。
+   ---------------------------------------------------------- */
+:root {
+    /* 背景色（暗 → 明 の階層） */
+    --bg-primary:   #0a0a0f;   /* ページ全体のベース背景 */
+    --bg-secondary: #12121a;   /* ナビバー・少し明るい領域 */
+    --bg-card:      #1a1a2e;   /* カード（投稿・プロフィール等） */
+    --bg-input:     #16162a;   /* 入力欄の背景 */
+
+    /* テキスト色（明 → 暗 の階層） */
+    --text-primary:   #e4e4e7;
+    --text-secondary: #a1a1aa;
+    --text-muted:     #71717a;
+
+    /* 枠線・アクセント（ネオン感のあるパープル） */
+    --border:      #27273a;
+    --accent:      #6366f1;
+    --accent-glow: rgba(99, 102, 241, 0.3);  /* グロー（光彩）用の半透明色 */
+
+    /* ステータスカラー */
+    --success: #22c55e;
+    --error:   #ef4444;
+
+    /* 角丸 */
+    --radius:    12px;   /* 標準 */
+    --radius-sm: 8px;    /* 小さめ */
+
+    /* 影 */
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ----------------------------------------------------------
+   全要素リセット
+     box-sizing: border-box → padding/border を width に含める
+     （計算が直感的になり、レイアウト崩れを防ぐ）
+   ---------------------------------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+a:hover { opacity: 0.8; }
+
+/* ============================================================
+   ナビバー
+     position: sticky → スクロール時も画面上部に貼り付く
+     z-index: 100    → 他の要素より前面に表示
+     backdrop-filter: blur(12px) → 背景をぼかす（ガラス風）
+   ============================================================ */
+.navbar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+}
+
+.nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    color: var(--accent);
+    font-size: 1.6rem;
+    /* ロゴアイコンを「拍動するように光らせる」アニメーション */
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------------
+   @keyframes pulse-glow
+     光彩を弱→強→弱と変化させて拍動感を出す。
+     アプリ名「Pulse」を象徴するキーアニメーション。
+   ---------------------------------------------------------- */
+@keyframes pulse-glow {
+    0%, 100% { text-shadow: 0 0 8px var(--accent-glow); }
+    50%      { text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent-glow); }
+}
+
+.pulse-animate {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+.nav-link:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.05);
+    opacity: 1;
+}
+.nav-link.active {
+    color: var(--accent);
+    background: var(--accent-glow);
+}
+
+/* ============================================================
+   アバター（円形のユーザーアイコン）
+     border-radius: 50% で正円に
+     表示名の頭文字1文字を中央配置
+   ============================================================ */
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.whisper-avatar {
+    background: var(--bg-card) !important;
+    border: 2px dashed var(--text-muted);
+    color: var(--text-muted) !important;
+}
+
+/* ============================================================
+   コンテナ（中央寄せの最大幅レイアウト）
+     margin: 0 auto で左右中央揃え
+   ============================================================ */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px;
+}
+
+/* ============================================================
+   ボタン
+     共通の .btn と、用途別の .btn-primary / .btn-outline / .btn-glow など
+     transition: ホバー時のアニメーションを滑らかにする
+   ============================================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-primary);
+    background: var(--bg-card);
+}
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 4px 16px var(--accent-glow);
+}
+.btn-primary:hover {
+    box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+}
+
+.btn-full { width: 100%; }
+.btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+.btn-glow {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* 拍動エフェクト付きボタン:
+   ::after 疑似要素で円形グラデの光を重ね、ホバーでフェードイン */
+.btn-pulse {
+    position: relative;
+    overflow: hidden;
+}
+.btn-pulse::after {
+    content: '';                /* 疑似要素には content が必須 */
+    position: absolute;
+    inset: 0;                   /* top:0; right:0; bottom:0; left:0 の省略形 */
+    background: radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.btn-pulse:hover::after { opacity: 1; }
+
+.btn-icon {
+    font-size: 1.1rem;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   フォーム（input, textarea, select の共通スタイル）
+     focus 時にアクセントカラーのグロー（光彩）で視覚的フィードバック
+   ============================================================ */
+.form-group {
+    margin-bottom: 16px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+textarea { resize: vertical; font-family: inherit; }
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+.form-row .form-group { flex: 1; }
+
+.char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* ============================================================
+   アラート（エラー/成功メッセージ）
+     色は :root のカラーパレットに合わせ、半透明の背景＋枠線で柔らかく
+   ============================================================ */
+.alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+.alert-info {
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    color: #c7d2fe;
+}
+.alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #86efac;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ============================================================
+   認証ページ（login.php / register.php）の中央寄せカード
+   ============================================================ */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 160px);
+}
+
+.auth-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: var(--shadow);
+}
+
+.auth-title {
+    font-size: 1.6rem;
+    text-align: center;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+}
+
+.auth-form { margin-top: 8px; }
+
+.auth-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   タイムライン2カラムレイアウト
+     左 300px = サイドバー / 右 = 投稿一覧
+     CSS Grid で組む。tablet 以下では1カラムに切替。
+   ============================================================ */
+.timeline-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;   /* 1fr = 残り幅をすべて使う */
+    gap: 24px;
+    align-items: start;
+}
+
+/* メディアクエリ: 画面幅が 768px 以下のときのスタイル（スマホ向け） */
+@media (max-width: 768px) {
+    .timeline-layout {
+        grid-template-columns: 1fr;     /* 1カラム化 */
+    }
+    /* スマホではタイムライン → サイドバーの順に並べる */
+    .sidebar  { order: 2; }
+    .timeline { order: 1; }
+}
+
+.timeline-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* ============================================================
+   サイドバー（感情天気予報・ムードフィルター）
+     position: sticky でスクロール時も画面に追従（top: 84px = ナビバー分の余白）
+   ============================================================ */
+.sidebar {
+    position: sticky;
+    top: 84px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.weather-card, .mood-filter-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+
+.weather-title {
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+.weather-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+.weather-empty {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 16px 0;
+}
+
+.weather-bar-wrap {
+    margin-bottom: 10px;
+}
+.weather-label {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.weather-bar-bg {
+    height: 8px;
+    background: var(--bg-input);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.weather-bar {
+    height: 100%;
+    border-radius: 4px;
+    /* width 変化を 0.6 秒かけてアニメーション → 棒が伸びる演出 */
+    transition: width 0.6s ease;
+    /* currentColor: 現在の color プロパティの値を再利用 → ムード色のグロー */
+    box-shadow: 0 0 8px currentColor;
+}
+.weather-percent {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.mood-filter-card h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+}
+.mood-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.mood-chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.mood-chip:hover {
+    border-color: var(--mood-color, var(--accent));
+    color: var(--text-primary);
+    opacity: 1;
+}
+.mood-chip.active {
+    background: var(--mood-color, var(--accent));
+    color: white;
+    border-color: transparent;
+    /* color-mix(): 2 つの色を混ぜる関数（モダン CSS）。ここでは40%のムード色＋透明 → グロー色を動的に作成 */
+    box-shadow: 0 0 12px color-mix(in srgb, var(--mood-color, var(--accent)) 40%, transparent);
+}
+
+/* ============================================================
+   投稿カード
+     左側に「ムード色のボーダー」を 3px 表示する → 一目で感情がわかる
+     position: relative + overflow: hidden で .post-ripple を内部に閉じ込める
+   ============================================================ */
+.post-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    /* HTML 側の style="--mood-color:..." で投稿ごとに色が変わる */
+    border-left: 3px solid var(--mood-color, var(--accent));
+}
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 16px color-mix(in srgb, var(--mood-color) 15%, transparent);
+}
+
+/* 静的な装飾用の波紋
+   （JS が共鳴時に挿入する波紋とは別。カード右上にぼんやり光るムード色） */
+.post-ripple {
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--mood-color) 8%, transparent), transparent 70%);
+    pointer-events: none;     /* マウスイベントを透過 → 下のボタンを邪魔しない */
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.post-meta {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.post-author {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+.whisper-author {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.post-username {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.post-time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.post-mood-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 0 8px color-mix(in srgb, var(--mood-color) 30%, transparent);
+}
+
+.post-content {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+
+.timecapsule-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(250, 204, 21, 0.1);
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #facc15;
+    margin-bottom: 8px;
+}
+
+.post-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+
+.resonate-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+.resonate-btn:hover {
+    border-color: var(--mood-color, var(--accent));
+    color: var(--mood-color, var(--accent));
+}
+.resonate-btn.resonated {
+    border-color: var(--mood-color, var(--accent));
+    color: var(--mood-color, var(--accent));
+    background: color-mix(in srgb, var(--mood-color, var(--accent)) 10%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--mood-color, var(--accent)) 20%, transparent);
+}
+
+.resonate-icon {
+    font-size: 1.1rem;
+    transition: transform 0.3s;
+}
+.resonate-btn.resonated .resonate-icon {
+    transform: scale(1.2);
+    animation: resonate-pulse 0.4s ease;
+}
+
+/* 共鳴ボタンのアイコンが「拍動して大きくなる」アニメーション */
+@keyframes resonate-pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.5); }
+    100% { transform: scale(1.2); }
+}
+
+/* ============================================================
+   返信機能（返信ボタン・返信フォーム・返信カード）
+     fadeInUp アニメーションでなめらかに出現
+     replies-wrap は左に縦線（ボーダー）を引いてスレッド感を演出
+   ============================================================ */
+.reply-toggle-btn, .reply-show-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+.reply-toggle-btn:hover, .reply-show-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.reply-form-wrap {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    animation: fadeInUp 0.3s ease;
+}
+
+.reply-form-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reply-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.reply-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.reply-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.reply-mood-select {
+    padding: 6px 10px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.reply-mood-select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.replies-wrap {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    padding-left: 16px;
+    border-left: 2px solid var(--accent-glow);
+    animation: fadeInUp 0.3s ease;
+}
+
+.replies-loading, .replies-empty {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 8px 0;
+}
+
+.reply-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-left: 2px solid var(--mood-color, var(--accent));
+    animation: fadeInUp 0.3s ease;
+}
+
+.reply-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.avatar-xs {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.reply-meta {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.reply-author {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.reply-username {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.reply-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.reply-mood-badge {
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.reply-content {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+.reply-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.resonate-btn-sm {
+    padding: 3px 10px;
+    font-size: 0.8rem;
+}
+.resonate-btn-sm .resonate-icon {
+    font-size: 0.9rem;
+}
+
+/* ============================================================
+   投稿フォーム（post.php）
+     mood-selector を CSS Grid で 4 列に配置（スマホでは 2 列）
+   ============================================================ */
+.post-page {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+.page-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+}
+
+.post-form {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.mood-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+@media (max-width: 500px) {
+    .mood-selector { grid-template-columns: repeat(2, 1fr); }
+}
+
+.mood-option {
+    cursor: pointer;
+}
+/* ラジオボタン本体は非表示にして、ラベル全体をクリック可能にする
+   （:checked は隠れていても CSS セレクタで判定できる） */
+.mood-option input { display: none; }
+
+.mood-option-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+    text-align: center;
+}
+.mood-option-inner:hover {
+    border-color: var(--mood-color);
+    background: color-mix(in srgb, var(--mood-color) 8%, transparent);
+}
+/* 隣接セレクタ "input:checked + .mood-option-inner":
+   選択中のラジオボタンの直後にある .mood-option-inner だけスタイル変更
+   → ムードを選んだものだけ枠が光る */
+.mood-option input:checked + .mood-option-inner {
+    border-color: var(--mood-color);
+    background: color-mix(in srgb, var(--mood-color) 15%, transparent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--mood-color) 25%, transparent);
+}
+
+.mood-emoji { font-size: 1.6rem; }
+.mood-label { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* ============================================================
+   投稿オプション（ささやきモード / タイムカプセル）
+     チェックボックスをトグル風の見た目に
+   ============================================================ */
+.post-options {
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.option-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.option-toggle:hover {
+    border-color: var(--accent);
+}
+
+.option-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+}
+
+.option-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.option-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+.timecapsule-settings {
+    padding: 12px 16px;
+    background: var(--bg-input);
+    border: 1px solid rgba(250, 204, 21, 0.2);
+    border-radius: var(--radius-sm);
+    margin-top: -4px;
+}
+
+/* ============================================================
+   プロフィールページ
+     ヘッダー（アバター＋名前＋フォローボタン）
+     感情オーラ / 統計タブ / ユーザーリスト
+   ============================================================ */
+.profile-page {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.profile-info { flex: 1; }
+
+.profile-name {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+}
+.profile-username {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+.profile-bio {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.follow-btn {
+    align-self: flex-start;
+}
+
+/* ----------------------------------------------------------
+   感情オーラ
+     直近7日間のムード上位3つを「浮遊する球体」で可視化。
+     aura-float アニメーションで上下にゆらゆら動く。
+   ---------------------------------------------------------- */
+.aura-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.aura-card h3 {
+    font-size: 1rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.aura-period {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+.aura-empty {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.aura-display {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 16px 0;
+}
+
+.aura-orb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    animation: aura-float 3s ease-in-out infinite;
+}
+/* 各オーブのアニメーション開始時刻をずらして、ばらばらに浮遊させる */
+.aura-orb:nth-child(2) { animation-delay: 0.5s; }
+.aura-orb:nth-child(3) { animation-delay: 1s; }
+
+/* 上下に 8px ふわふわ移動するアニメーション */
+@keyframes aura-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+
+.aura-emoji {
+    font-size: 2.2rem;
+    /* drop-shadow: 絵文字の輪郭にムード色のグロー（光彩）を付ける */
+    filter: drop-shadow(0 0 12px var(--aura-color));
+}
+.aura-mood-label {
+    font-size: 0.8rem;
+    color: var(--aura-color);
+    font-weight: 600;
+}
+
+/* ----------------------------------------------------------
+   統計タブ（パルス数 / フォロワー / フォロー中）
+     クリックでタブ切り替え。stat-active で現在タブをハイライト。
+   ---------------------------------------------------------- */
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+}
+.stat-link {
+    display: block;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+.stat-link:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    opacity: 1;
+}
+.stat-active {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, var(--bg-card));
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.profile-posts h2, .profile-users-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* ----------------------------------------------------------
+   ユーザーリスト（フォロワー / フォロー中タブで表示）
+   ---------------------------------------------------------- */
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeInUp 0.4s ease;
+}
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.user-card-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: box-shadow 0.2s;
+}
+.user-card-avatar:hover {
+    box-shadow: 0 0 14px rgba(99, 102, 241, 0.4);
+    opacity: 1;
+}
+
+.user-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-card-name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+.user-card-name:hover {
+    color: var(--accent);
+    opacity: 1;
+}
+
+.user-card-username {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+
+.user-card-bio {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.user-card-stat {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    display: inline-block;
+}
+
+.user-card .follow-btn {
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   空状態（投稿が0件・フォロワーが0人 等の時の表示）
+   ============================================================ */
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+}
+.empty-icon {
+    font-size: 3rem;
+    color: var(--accent);
+    margin-bottom: 12px;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   フッター
+   ============================================================ */
+.footer {
+    text-align: center;
+    padding: 24px 20px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+}
+
+/* ============================================================
+   エントリーアニメーション（投稿カードの登場演出）
+     下から 16px の位置でフェードイン
+   ============================================================ */
+.post-card {
+    animation: fadeInUp 0.4s ease;
+}
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 上位5件の投稿カードを少しずつ遅延させて、波打つように出現させる
+   （nth-child(n) は親要素の n 番目の子要素にマッチ） */
+.post-card:nth-child(2) { animation-delay: 0.05s; }
+.post-card:nth-child(3) { animation-delay: 0.10s; }
+.post-card:nth-child(4) { animation-delay: 0.15s; }
+.post-card:nth-child(5) { animation-delay: 0.20s; }
+
+/* ============================================================
+   スクロールバーのカスタマイズ（WebKit 系ブラウザ専用）
+     Chrome / Safari / Edge では細く目立たないバーになる
+     Firefox では効かない（CSS 標準の scrollbar-* は別途必要）
+   ============================================================ */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+/* POST 送信のログアウトボタンを通常のナビリンクと同じ見た目にする */
+.nav-logout-form { display: inline; margin: 0; }
+.nav-link-button { background: none; border: 0; cursor: pointer; font: inherit; }

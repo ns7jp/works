@@ -1,0 +1,50 @@
+name: PHP check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: pdo_sqlite, mbstring
+
+      - name: Run static application checks
+        run: sh scripts/check.sh
+
+      - name: Check Docker Compose configuration
+        run: docker compose config --quiet
+
+      - name: Build container image
+        run: docker compose build
+
+      - name: Start and smoke test
+        run: |
+          docker compose up -d
+          sh scripts/smoke-test.sh
+          container_id="$(docker compose ps -q pulse)"
+          test "$(docker inspect --format '{{.HostConfig.ReadonlyRootfs}}' "$container_id")" = true
+          docker inspect --format '{{json .HostConfig.CapDrop}}' "$container_id" | grep -q 'ALL'
+          docker inspect --format '{{json .HostConfig.SecurityOpt}}' "$container_id" | grep -q 'no-new-privileges'
+          docker compose stop --timeout 5 pulse
+          test "$(docker inspect --format '{{.State.Status}}' "$container_id")" = exited
+          docker compose start pulse
+          sh scripts/smoke-test.sh
+
+      - name: Show diagnostics on failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs
+
+      - name: Remove test environment
+        if: always()
+        run: docker compose down --volumes --remove-orphans
