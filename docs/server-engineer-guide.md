@@ -18,6 +18,22 @@
 
 `<サービス名>` は説明用の置き換え記号です。実行するときは、対象名を確認して `nginx` などに置き換えます。
 
+## もう一歩：サーバー構築の基礎用語と確認コマンド
+
+「最初に覚える7語」の次に出会うことが多い言葉です。まずは「何のためにあるか」と「確認コマンド」だけ覚えれば十分です。
+
+| 用語 | 何のためにあるか | 確認コマンド（例） |
+|---|---|---|
+| DNS | ドメイン名をIPアドレスに変換する仕組み | `dig example.com` または `nslookup example.com` |
+| TLS / HTTPS | 通信を暗号化し、なりすましを防ぐ | `openssl s_client -connect example.com:443 -brief` |
+| ファイアウォール | 許可した通信だけを通す壁 | `sudo ufw status`（Ubuntu系）／`sudo firewall-cmd --list-all`（RHEL系） |
+| sudo / 権限管理 | 一般ユーザーが管理者権限の操作を行う仕組み | `sudo -l`（自分が実行できる管理コマンドの一覧） |
+| cron | 決まった時刻に処理を自動実行する仕組み | `crontab -l`（現在の予約一覧を表示） |
+| Docker | アプリと実行環境をまとめて配布・起動する仕組み | `docker --version`、`docker ps` |
+| クラウド（AWS/GCPなど） | 自分でハードウェアを持たずにサーバーを借りる仕組み | （学習は各クラウドの無料枠案内に従う。誤操作で課金が発生する可能性があるため、必ず利用規約と料金体系を確認してから使う） |
+
+DNSとTLSは、Pulseや掲示板アプリを独自ドメイン・HTTPSで公開する場合に必要になる基礎です。ファイアウォール・sudo・cronは、Linuxサーバーを運用する上で日常的に使います。Dockerとクラウドは、開発環境と本番環境の差を減らす・実機を持たずに練習する手段として、次の学習候補に位置づけています。
+
 ## まず見る4か所
 
 トラブル時は、いきなり設定を変更せず、次の順で事実を集めます。
@@ -44,7 +60,7 @@ journalctl -u <サービス名> -n 50 --no-pager
 
 ### 1. 正常な状態を記録する
 
-次の結果を [確認記録テンプレート](./verification-record.md) に貼り付けます。
+次の結果を [確認記録テンプレート](./verification-record.md) に貼り付けます。記入例は [確認記録の記入例](./verification-record-example.md) を参考にしてください。
 
 ```bash
 date --iso-8601=seconds
@@ -84,10 +100,59 @@ HTTPサーバーを終了した後、もう一度 `curl` を実行します。�
 
 「動かない → 再起動」ではなく、「状態を確認 → 原因を仮定 → 一つだけ試す → 再確認」の順を守ります。
 
+### よくある症状パターン（学習用）
+
+接続失敗以外にも、初学者が最初に出会いやすい症状があります。まず症状から仮説を立て、確認コマンドで裏付けてから対処します。
+
+| 症状 | よくある原因の仮説 | 確認コマンドの例 |
+|---|---|---|
+| `Address already in use` と表示されて起動しない | 同じポートを別のプロセスが既に使っている | `ss -lntp`（無ければ `netstat -lntp`）でポートを使っているプロセスを確認 |
+| `Permission denied` と表示される | 実行権限が無い、または1024番未満のポートを一般ユーザーで使おうとしている | `ls -l` で実行権限を確認。1024番未満のポートは `sudo` が必要な場合が多い |
+| 設定ファイルを変更したらサービスが起動しなくなった | 設定ファイルの文法エラー | サービスごとの設定確認コマンド（例：`nginx -t`）で文法だけを検査してから再起動する |
+
+いずれの場合も、いきなり修正せず「確認コマンドで原因を1つに絞ってから、最小の変更を1つだけ試す」流れは共通です。
+
+## 応用演習：サービス管理に触れる（60分・学習用Linux環境が必要）
+
+`systemctl` を使い、サービスを作る・止める・直すという一連の操作を体験します。対象は自分の学習用Linux環境に限定します。
+
+1. 学習用のダミーサービスを1つ作ります（例：`sleep infinity` を動かすだけの `study.service` を `/etc/systemd/system/study.service` に作成）。
+2. 反映と起動を行います。
+
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now study.service
+   systemctl status study.service --no-pager
+   ```
+
+3. 意図的に停止し、状態を確認します。
+
+   ```bash
+   sudo systemctl stop study.service
+   systemctl status study.service --no-pager
+   journalctl -u study.service -n 20 --no-pager
+   ```
+
+4. 復旧します。
+
+   ```bash
+   sudo systemctl start study.service
+   systemctl is-active study.service
+   ```
+
+期待結果: 起動直後は `active (running)`、停止後は `inactive (dead)` または `failed`、復旧後は再び `active (running)` になることを、それぞれ `systemctl status` の出力で説明できること。この一連の操作結果も [確認記録テンプレート](./verification-record.md) に残します。
+
 ## 障害対応の基本形
 
-```text
-検知 → 影響確認 → 事実収集 → 原因の仮説 → 安全な対処 → 再確認 → 記録
+```mermaid
+flowchart LR
+    A[検知] --> B[影響確認]
+    B --> C[事実収集]
+    C --> D[原因の仮説]
+    D --> E[安全な対処]
+    E --> F[再確認]
+    F --> G[記録]
+    F -. 直っていない .-> C
 ```
 
 - 検知：何が、いつから、どう失敗しているか

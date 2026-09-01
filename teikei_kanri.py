@@ -209,7 +209,7 @@ class TemplateManager:
             try:
                 # 成功したら即その内容を返す
                 return filepath.read_text(encoding=enc)
-            except:
+            except Exception:
                 # 失敗したら次のエンコーディングを試す
                 continue
         # 全部失敗した場合はエラーを発生させる(呼び出し元の except に飛ぶ)
