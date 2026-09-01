@@ -251,9 +251,42 @@ print(result.returncode)
 4. `with`、`try`、ログなど、失敗時の処理を確認する
 5. 外部入力、ファイル、コマンドの境界に安全対策があるか確認する
 
-このリポジトリでは、まず短い `sticky_notes.py`、次に `teikei_kanri.py`、その後にserver-monitorの `app.py` を読むと段階的に学べます。
+このリポジトリでは、まず短い `teikei_kanri.py`（約370行、単一クラス）、次に `sticky_notes.py`（約1030行、2クラス構成）、その後にserver-monitorの `app.py` を読むと、行数・クラス数が段階的に増える順で学べます。
 
 ## 6. ミニ演習
+
+3段階の演習を用意しています。結果を予想してから実行し、予想と違ったら理由を考えてください。自分で試したい場合は、答え合わせの前に該当する説明（1〜4章）を読み返すのも良い方法です。
+
+### 基礎：変数と条件分岐だけを使う
+
+次を `hello_status.py` として保存します。
+
+```python
+service_name = "nginx"
+is_running = True
+
+if is_running:
+    print(f"{service_name} is running")
+else:
+    print(f"{service_name} is stopped")
+```
+
+確認コマンド：
+
+```bash
+python hello_status.py
+```
+
+やってみること：`is_running` を `False` に変えて、表示がどう変わるか予想してから実行します。
+
+<details>
+<summary>ヒント</summary>
+
+`if` は `is_running` が `True` か `False` かで、実行する行を1つだけ選びます。値そのものを変えても `if` の書き方は変えません。
+
+</details>
+
+### 標準：関数と分岐を組み合わせる
 
 次を `check_disk.py` として保存し、値を `75`、`85`、`95` に変えて結果を確認します。
 
@@ -283,6 +316,56 @@ python -m py_compile check_disk.py
 ```
 
 期待結果：`85` では `warning` と表示され、構文検査がエラーなしで終わります。
+
+### 応用：一覧・例外処理・ファイル出力を組み合わせる
+
+次を `check_services.py` として保存します。`teikei_kanri.py` や `sticky_notes.py` に近い、複数の要素を組み合わせた演習です。
+
+```python
+from pathlib import Path
+
+services = [
+    {"name": "nginx", "port": 80},
+    {"name": "app", "port": "invalid"},  # わざと不正な値を混ぜている
+]
+
+
+def describe(service: dict) -> str:
+    try:
+        port = int(service["port"])
+    except (KeyError, ValueError):
+        return f"{service.get('name', 'unknown')}: ポート情報が不正です"
+    return f"{service['name']}: port {port} を確認してください"
+
+
+def main() -> None:
+    lines = [describe(service) for service in services]
+    for line in lines:
+        print(line)
+
+    with Path("check_services_result.txt").open("w", encoding="utf-8") as file:
+        file.write("\n".join(lines) + "\n")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+確認コマンド：
+
+```bash
+python check_services.py
+cat check_services_result.txt
+```
+
+やってみること：`services` に3件目（正常なポート番号）を追加し、実行結果とファイルの中身が3行に増えることを確認します。
+
+<details>
+<summary>ヒント</summary>
+
+`services` の2件目は `port` が文字列 `"invalid"` なので、`int()` に変換しようとすると `ValueError` になります。`try` / `except` で捕まえているため、プログラム全体は止まらず、その行だけエラーメッセージに置き換わります。
+
+</details>
 
 ## 7. 確認問題
 

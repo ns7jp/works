@@ -6,7 +6,7 @@
 - **確認**：コマンドや画面で、想定どおり動くことを確かめる
 - **運用**：異常の発見、原因の切り分け、安全な復旧を考える
 
-現在の中心作品は [サーバー監視ダッシュボード](#⑥-サーバー監視ダッシュボードpython--flask--psutil--chartjs) です。Web アプリ作品では、サーバーが入力を受け取り、データベースへ保存し、結果を返す仕組みを学びました。デスクトップ作品では、運用担当者が使う小さな業務支援ツールを Python で作りました。
+現在の中心作品は [サーバー監視ダッシュボード](#-サーバー監視ダッシュボードpython--flask--psutil--chartjs) です。Web アプリ作品では、サーバーが入力を受け取り、データベースへ保存し、結果を返す仕組みを学びました。デスクトップ作品では、運用担当者が使う小さな業務支援ツールを Python で作りました。
 
 > [!IMPORTANT]
 > このリポジトリは学習成果の索引です。`teikei_kanri.py` と `sticky_notes.py` はこのリポジトリにコードがあります。ほかの4作品はリンク先の別リポジトリにコードがあります。実機・クラウド・本番環境での構築を、この README だけで実施済みとは扱いません。
@@ -26,15 +26,28 @@
 
 ---
 
+## 目次
+
+- [3分で分かるポイント](#3分で分かるポイント)
+- [📂 作品一覧](#-作品一覧)
+- [🔰 初学者向け：コードの読み方](#-初学者向けコードの読み方)
+- [🧰 事前準備（実際に動かしたい方へ）](#-事前準備実際に動かしたい方へ)
+- [① Pulse](#-snsアプリpulse--感情共鳴型snsphp--sqlite--javascript) / [② 掲示板](#-掲示板アプリphp--mysql) / [③ 定型文管理](#-定型文管理アプリpython--flet) / [④ 付箋](#-付箋アプリpython--tkinter) / [⑤ 企業サイト](#-サンプル企業サイトhtml--css--javascript--jquery) / [⑥ サーバー監視](#-サーバー監視ダッシュボードpython--flask--psutil--chartjs)
+- [🧗 詰まったこと・解決ログ](#-詰まったこと解決ログ)
+- [🛠 トラブルシューティング](#-トラブルシューティング利用者向け)
+- [👤 プロフィール](#-プロフィール)
+
+---
+
 ## 3分で分かるポイント
 
 採用担当者・初めて読む方は、次の順番で確認できます。
 
 1. 下の「身につけた力と証拠」で、学習内容と確認先を見る
-2. [サーバー監視ダッシュボード](#⑥-サーバー監視ダッシュボードpython--flask--psutil--chartjs) で、監視の仕組みを見る
+2. [サーバー監視ダッシュボード](#-サーバー監視ダッシュボードpython--flask--psutil--chartjs) で、監視の仕組みを見る
 3. [初学者向け学習ガイド](./docs/server-engineer-guide.md) で、用語と学習順を見る
 4. [Pythonキーワード集](./docs/python-keywords.md) / [PHPキーワード集](./docs/php-keywords.md) で、作品に出てくるコードを読む
-5. [確認記録テンプレート](./docs/verification-record.md) で、作業を証拠として残す方法を見る
+5. [確認記録テンプレート](./docs/verification-record.md)（[記入例](./docs/verification-record-example.md)）で、作業を証拠として残す方法を見る
 
 ### 身につけた力と証拠
 
@@ -45,7 +58,7 @@
 | データベース | SQLite / MySQL の登録・検索・更新・削除 | 別リポジトリにコードあり |
 | 監視 | CPU・メモリ・ディスク・通信・プロセスの可視化 | ローカル監視アプリあり |
 | セキュリティ基礎 | ハッシュ化、XSS / CSRF / SQLインジェクション対策 | 実装解説あり |
-| 自動確認 | GitHub Actions による Python 構文・文書リンク確認 | CI設定あり。今回の差分はローカル確認済み |
+| 自動確認 | GitHub Actions による Python 構文チェック・文書リンク確認（単体テストは未実装） | CI設定あり。今回の差分はローカル確認済み |
 | Linuxサーバー構築 | 手順化・確認・障害対応の学習 | 学習中。実機構築証跡は今後追加 |
 
 ### 覚え方：「作る → 見る → 直す → 残す」
@@ -86,7 +99,8 @@ works/
 │   ├── server-engineer-guide.md ... 初学者向けの用語・演習・障害対応
 │   ├── python-keywords.md ... Pythonの基本語とサーバー運用での使い方
 │   ├── php-keywords.md    ... PHPの基本語と安全なWeb処理の考え方
-│   └── verification-record.md   ... 構築・確認結果の記録テンプレート
+│   ├── verification-record.md   ... 構築・確認結果の記録テンプレート
+│   └── verification-record-example.md ... 上記テンプレートの記入例（実行済み）
 ├── scripts/
 │   └── check_docs.py     ... README と docs のローカルリンク確認
 └── template-files/       ... 定型文管理アプリの保存先（自動生成）
@@ -118,6 +132,53 @@ works/
 
 どちらも最後に確認問題とミニ演習があります。読むだけでなく、結果を予想してから自分の学習用環境で実行してください。
 
+### よく出る言葉のミニ用語集
+
+README や作品解説には、キーワード集にまだ載っていない言葉も出てきます。最初はこの一言訳で十分です。
+
+| 用語 | 一言で言うと |
+|---|---|
+| API | プログラム同士が情報をやり取りするための窓口 |
+| JSON API | JSON形式でデータをやり取りするAPI |
+| Ajax | 画面を全部読み込み直さずに、裏側でサーバーと通信すること |
+| CRUD | データの作成(Create)・表示(Read)・更新(Update)・削除(Delete)の4操作をまとめた呼び方 |
+| CI（継続的インテグレーション） | コードを変更するたびに、機械的なチェックを自動実行する仕組み |
+| セッション | ログイン状態など、複数ページにまたがる情報をサーバー側で覚えておく仕組み |
+
+---
+
+## 🧰 事前準備（実際に動かしたい方へ）
+
+コードを読むだけでなく実際に動かしてみたい方は、次を準備してください。読むだけで十分な場合は読み飛ばして [作品一覧](#-作品一覧) に進んでください。
+
+1. **Python / PHP が使えるか確認する**
+
+   ```bash
+   python3 --version   # 3.10 以降を想定（Windows は python --version の場合あり）
+   php --version        # 8.x を想定
+   ```
+
+   コマンドが見つからない場合は、[Python公式](https://www.python.org/downloads/) または [PHP公式](https://www.php.net/downloads) からインストールしてください。
+
+2. **このリポジトリを取得する**
+
+   ```bash
+   git clone https://github.com/ns7jp/works.git
+   cd works
+   ```
+
+   git を使わない場合は、GitHubの「Code」ボタンから ZIP をダウンロードしても構いません。
+
+3. **`docs/server-engineer-guide.md` の演習を試す学習用Linux環境を用意する（任意）**
+
+   サーバー構築・運用の演習は、壊しても困らない環境で行います。用意していない場合は、次のいずれかが手軽です。
+
+   - Windows: WSL2（`wsl --install` で Ubuntu を追加できます）
+   - macOS / Linux: VirtualBoxやUTMなどで作るLinux仮想マシン
+   - クラウドの無料枠・試用枠のLinux仮想マシン（利用条件は各サービスの案内に従ってください）
+
+   ローカルの `python3 -m http.server` を使う演習（[初学者向けサーバー構築・運用ガイド](./docs/server-engineer-guide.md) 内）は、上記のLinux環境がなくてもPython 3が動くPC・Macだけで試せます。
+
 ---
 
 ## ① SNSアプリ「Pulse」 — 感情共鳴型SNS（PHP / SQLite / JavaScript）
@@ -142,6 +203,39 @@ Pulse は、一般的な SNS の「文章を投稿する」「他の人の投稿
 
 「共鳴」やフォローなど、画面の一部だけを更新したい操作では JavaScript を使っています。ページ全体を再読み込みせずに反応が返るため、利用者には軽く動いているように感じられます。
 
+### テーブル構成（イメージ図）
+
+`config/database.php` で作成される主要テーブルの関係を図にすると、次のようになります。外部キーで `posts` が `users` を、`resonances` が `users` と `posts` の両方を参照する構成です。
+
+```mermaid
+erDiagram
+    users ||--o{ posts : "投稿する"
+    users ||--o{ resonances : "共鳴する"
+    users ||--o{ follows : "フォローする"
+    posts ||--o{ resonances : "共鳴される"
+    users {
+        int id PK
+        string username
+        string email
+        string password_hash
+    }
+    posts {
+        int id PK
+        int user_id FK
+        string body
+        string mood
+    }
+    resonances {
+        int id PK
+        int user_id FK
+        int post_id FK
+    }
+    follows {
+        int follower_id FK
+        int followee_id FK
+    }
+```
+
 ### コードを読む順番
 
 | 順番 | ファイル | 初学者向けの見どころ |
@@ -159,6 +253,27 @@ Pulse は、一般的な SNS の「文章を投稿する」「他の人の投稿
 投稿機能を追う場合は、まず `post.php` のフォームを見ます。`method="post"` で送信された内容は同じ `post.php` 内で受け取り、`verifyCSRFToken()` で正しい送信かを確認します。その後、`$pdo->prepare()` で SQL を準備し、本文やムードなどを `execute()` で安全に渡して `posts` テーブルに保存します。
 
 共鳴ボタンは、`index.php` のボタンに `data-post-id` を持たせ、`public/js/app.js` の関数から `api/resonate.php` に送信します。API 側では「すでに共鳴しているか」を調べ、あれば削除、なければ追加します。最後に JSON を返し、JavaScript が件数とボタン表示を更新します。
+
+共鳴ボタンを押したときの流れを図にすると、次のようになります。
+
+```mermaid
+sequenceDiagram
+    participant U as 利用者（ブラウザ）
+    participant JS as public/js/app.js
+    participant API as api/resonate.php
+    participant DB as SQLite（resonancesテーブル）
+
+    U->>JS: 共鳴ボタンをクリック
+    JS->>API: fetch()でpost_idを送信
+    API->>DB: 既に共鳴済みか確認（SELECT）
+    alt 未共鳴の場合
+        API->>DB: 共鳴を追加（INSERT）
+    else 共鳴済みの場合
+        API->>DB: 共鳴を取り消し（DELETE）
+    end
+    API-->>JS: 更新後の件数をJSONで返す
+    JS-->>U: ボタン表示と件数を更新（画面遷移なし）
+```
 
 ### 主な実装機能
 
@@ -192,6 +307,8 @@ Pulse は、一般的な SNS の「文章を投稿する」「他の人の投稿
 - ログイン機能とセッション管理の基本
 - 投稿・返信・リアクション・フォローなど、SNSに必要なテーブル設計
 - XSS / CSRF / SQLインジェクションなど、Web セキュリティの基礎
+
+[↑ 目次に戻る](#目次)
 
 ---
 
@@ -261,6 +378,8 @@ Pulse は、一般的な SNS の「文章を投稿する」「他の人の投稿
 - ログイン状態をセッションで保持する仕組み
 - 返信機能のような「データ同士の関連」の作り方
 - 入力値を安全に扱うための基本的な対策
+
+[↑ 目次に戻る](#目次)
 
 ---
 
@@ -337,6 +456,8 @@ Pulse は、一般的な SNS の「文章を投稿する」「他の人の投稿
 pip install flet pyperclip
 python teikei_kanri.py
 ```
+
+[↑ 目次に戻る](#目次)
 
 ---
 
@@ -437,6 +558,8 @@ python sticky_notes.py
 
 Python 標準ライブラリのみで動作します。
 
+[↑ 目次に戻る](#目次)
+
 ---
 
 ## ⑤ サンプル企業サイト（HTML / CSS / JavaScript / jQuery）
@@ -506,6 +629,8 @@ Python 標準ライブラリのみで動作します。
 - JavaScript でユーザー操作に反応する方法
 - デザインカンプをもとに実装する実務に近い流れ
 - PC とスマートフォンの両方を意識したページ作り
+
+[↑ 目次に戻る](#目次)
 
 ---
 
@@ -607,6 +732,36 @@ python app.py
 ```text
 http://localhost:5000/
 ```
+
+[↑ 目次に戻る](#目次)
+
+---
+
+## 🧗 詰まったこと・解決ログ
+
+作った機能の説明だけでなく、実際に詰まった点と直し方も記録します。原因の切り分けは、前職（製造業）での品質管理業務とも近い考え方だと感じています。
+
+### 1. 文字コードの違いでファイルが読めない（定型文管理アプリ）
+
+- **症状**: Windowsのメモ帳やExcelから持ってきた `.txt` を開くと、文字化けまたは読み込みエラーになることがあった。
+- **原因**: 保存時の文字コードが環境によって `utf-8` / `utf-8-sig`（BOM付き） / `cp932`（Shift-JIS系）と異なっていた。
+- **対処**: `teikei_kanri.py` の `read_file()` で、`utf-8` → `utf-8-sig` → `cp932` の順に読み込みを試し、最初に成功した結果を使うようにした。
+- **教訓**: 「1つの方法で全部読めるはず」と決め打ちせず、複数の可能性を順番に試す設計にすると、環境差による失敗に強くなる。
+
+### 2. CPU使用率が起動直後だけ0%と表示される（サーバー監視ダッシュボード）
+
+- **症状**: ダッシュボードを開いた直後、CPU使用率が実際の値によらず0%と表示されることがあった。
+- **原因**: `psutil.cpu_percent()` は、引数なしで呼ぶと「前回呼び出しからの経過時間」で計測するため、プロセス起動直後の1回目は基準がなく0%になる。
+- **対処**: `psutil.cpu_percent(interval=0.5)` として、0.5秒間隔で実測してから値を返すようにした。
+- **教訓**: ライブラリの初期値・初回呼び出し時の挙動は、ドキュメントで確認してから使う。
+
+### 3. 教材コードに「避けるべき」と書いた書き方が残っていた
+
+- **症状**: 2026年9月、初心者向けフィードバックをもとにこのREADMEとdocsを見直していたところ、[Pythonキーワード集](./docs/python-keywords.md) で「`except Exception:` のように種類を絞る」と説明している一方、`teikei_kanri.py` と `sticky_notes.py` 本体には裸の `except:`（例外の種類を絞らない書き方）が合計13箇所残っていることに気づいた。
+- **原因**: 教材の説明文とサンプルコードを別々に手直ししていて、互いの整合性を見落としていた。
+- **対処**: 13箇所すべてを `except Exception:` に統一し、`python -m py_compile` で構文エラーが無いことを確認した。
+- **教訓**: 「教材として読ませるコード」と「教材の説明文」は、片方だけ直すと矛盾が残る。両方をセットで確認する。
+
 ---
 
 ## 🛠 トラブルシューティング（利用者向け）
@@ -662,6 +817,10 @@ brew install python-tk
   - 食品衛生管理者
 - 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
 - 📧 net7jp@gmail.com
+
+### 🤖 AIツールの活用について
+
+このリポジトリのドキュメント整備（README・docsの構成見直し、誤りの修正、図解や演習の追加など）には Claude Code（AIコーディングアシスタント）を活用しています。アプリのコード自体（`teikei_kanri.py` / `sticky_notes.py`）の設計・実装は本人によるものです。AIツールを使いこなして開発・文書整備を効率化することも、実務で求められるスキルの一つと捉えています。
 
 ---
 

@@ -340,6 +340,43 @@ APIでは内容に合った `Content-Type` とHTTPステータスを返します
 
 ## 9. ミニ演習
 
+3段階の演習を用意しています。結果を予想してから実行し、予想と違ったら理由を考えてください。
+
+### 基礎：変数と条件分岐だけを使う
+
+次を `hello_status.php` として保存します。
+
+```php
+<?php
+declare(strict_types=1);
+
+$serviceName = 'nginx';
+$isRunning = true;
+
+if ($isRunning) {
+    echo "{$serviceName} is running" . PHP_EOL;
+} else {
+    echo "{$serviceName} is stopped" . PHP_EOL;
+}
+```
+
+確認コマンド：
+
+```bash
+php hello_status.php
+```
+
+やってみること：`$isRunning` を `false` に変えて、表示がどう変わるか予想してから実行します。
+
+<details>
+<summary>ヒント</summary>
+
+`if` は `$isRunning` が `true` か `false` かで、実行する行を1つだけ選びます。
+
+</details>
+
+### 標準：関数と分岐を組み合わせる
+
 次を `level.php` として保存し、数値を変えて結果を確認します。
 
 ```php
@@ -372,6 +409,52 @@ php -l level.php
 ```
 
 期待結果：`85` では `warning` と表示され、構文検査で `No syntax errors detected` と表示されます。
+
+### 応用：配列・例外処理・エスケープを組み合わせる
+
+次を `check_services.php` として保存します。掲示板アプリやPulseに近い、複数要素を組み合わせた演習です。
+
+```php
+<?php
+declare(strict_types=1);
+
+$services = [
+    ['name' => 'nginx', 'port' => 80],
+    ['name' => 'app', 'port' => 'invalid'], // わざと不正な値を混ぜている
+];
+
+function describeService(array $service): string
+{
+    $name = htmlspecialchars((string) ($service['name'] ?? 'unknown'), ENT_QUOTES, 'UTF-8');
+
+    if (!isset($service['port']) || !is_numeric($service['port'])) {
+        return "{$name}: ポート情報が不正です";
+    }
+
+    $port = (int) $service['port'];
+    return "{$name}: port {$port} を確認してください";
+}
+
+foreach ($services as $service) {
+    echo describeService($service) . PHP_EOL;
+}
+```
+
+確認コマンド：
+
+```bash
+php check_services.php
+php -l check_services.php
+```
+
+やってみること：`$services` に3件目（正常なポート番号）を追加し、出力が3行に増えることを確認します。
+
+<details>
+<summary>ヒント</summary>
+
+2件目は `port` が文字列 `'invalid'` で数値ではないため、`is_numeric()` が `false` を返し、「ポート情報が不正です」という行になります。`is_numeric()` で先に確認してから `(int)` に変換することで、想定外の値が紛れ込んでもエラーで止まらないようにしています。
+
+</details>
 
 ## 10. 確認問題
 

@@ -114,7 +114,7 @@ class StickyNote:
                 # 既存のウィンドウを最前面に持ってくる
                 self.window.lift()
                 return  # 関数を抜ける（新しく作る必要なし）
-            except:
+            except Exception:
                 # 例外（エラー）が出たら無視して、新しいウィンドウを作る処理に進む
                 pass
 
@@ -336,7 +336,7 @@ class StickyNote:
                 # 入力欄の文字を取得。空なら「無題の付箋」を返す。
                 # Pythonの "or" 演算子は、左がFalse的（空文字含む）なら右の値を返す。
                 return self.title_entry.get().strip() or "無題の付箋"
-            except:
+            except Exception:
                 # 何かエラーが出たら、内部に保持している値を返す
                 return self.title_text
         # ウィンドウが閉じているときは内部値を返す
@@ -348,7 +348,7 @@ class StickyNote:
             try:
                 # "1.0" 〜 tk.END は「最初から最後まで」を意味する
                 return self.text.get("1.0", tk.END).strip()
-            except:
+            except Exception:
                 return self.content_text
         return self.content_text
 
@@ -361,7 +361,7 @@ class StickyNote:
                 # winfo_x() / winfo_y() でウィンドウの座標を取得
                 self.x = self.window.winfo_x()
                 self.y = self.window.winfo_y()
-            except:
+            except Exception:
                 pass
         # タプル（複数値の組）として返す
         return self.x, self.y
@@ -400,7 +400,7 @@ class StickyNote:
                             child.configure(bg=self.color)
                         elif isinstance(child, tk.Frame):
                             child.configure(bg=self.color)
-        except:
+        except Exception:
             pass
 
     def save_this_note(self):
@@ -419,7 +419,7 @@ class StickyNote:
                 try:
                     # destroy() でウィンドウを完全に破棄
                     self.window.destroy()
-                except:
+                except Exception:
                     pass
             # 親アプリの notes 辞書からこの付箋を削除。
             # pop の第2引数 None は「キーが無くてもエラーを出さない」という意味。
@@ -440,7 +440,7 @@ class StickyNote:
                 self.title_text = self.get_title()
                 self.content_text = self.get_content()
                 self.get_position()
-            except:
+            except Exception:
                 pass
 
         # 空の付箋かチェック
@@ -449,7 +449,7 @@ class StickyNote:
             if self.window:
                 try:
                     self.window.destroy()
-                except:
+                except Exception:
                     pass
             self.parent.notes.pop(self.note_id, None)
             self.parent.save_notes()
@@ -463,7 +463,7 @@ class StickyNote:
         if self.window:
             try:
                 self.window.destroy()
-            except:
+            except Exception:
                 pass
 
         # ウィンドウ参照をクリアし、閉じた状態としてマーク
@@ -480,7 +480,7 @@ class StickyNote:
                 # lift() で最前面に表示
                 self.window.lift()
                 return
-            except:
+            except Exception:
                 pass
 
         # まだ作られていなければ新規作成
@@ -494,7 +494,7 @@ class StickyNote:
                 # state() は閉じられたウィンドウだとエラーになる性質を利用
                 self.window.state()
                 return True
-            except:
+            except Exception:
                 # エラーになったら閉じている
                 self.is_open = False
                 return False
@@ -837,7 +837,7 @@ class StickyNotesApp:
                 if note.window:
                     try:
                         note.window.destroy()
-                    except:
+                    except Exception:
                         pass
                 # 辞書から削除
                 self.notes.pop(note_id, None)
