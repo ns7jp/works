@@ -21,3 +21,9 @@ jobs:
 
       - name: Check Markdown local links
         run: python scripts/check_docs.py
+
+      - name: Install Tkinter (for sticky_notes.py unit tests)
+        run: sudo apt-get update && sudo apt-get install -y python3-tk
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
