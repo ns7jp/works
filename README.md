@@ -106,7 +106,8 @@ works/
 ├── scripts/
 │   └── check_docs.py     ... README と docs のローカルリンク確認
 ├── tests/
-│   └── test_sticky_notes.py ... 付箋アプリのGUIに依存しない部分の単体テスト
+│   ├── test_sticky_notes.py ... 付箋アプリのGUIに依存しない部分の単体テスト
+│   └── test_teikei_kanri.py ... 定型文管理アプリの文字コード自動判定ロジックの単体テスト
 └── template-files/       ... 定型文管理アプリの保存先（自動生成）
 ```
 

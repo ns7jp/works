@@ -362,5 +362,8 @@ def main(page: ft.Page):
 
 
 # ft.app() を呼ぶとウィンドウが立ち上がり、target に渡した main() が実行される
-# このスクリプトを直接実行したときに動き出すエントリーポイント
-ft.app(target=main)
+# if __name__ == "__main__": で囲むことで、他のファイル(テストなど)から
+# import teikei_kanri しただけではアプリが起動しないようにしている。
+# このスクリプトを直接実行したときだけ動き出すエントリーポイント。
+if __name__ == "__main__":
+    ft.app(target=main)
