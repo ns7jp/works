@@ -2,7 +2,7 @@
 
 **島田則幸（Noriyuki Shimada）** が、未経験からサーバー構築・運用に必要な力を身につける過程をまとめたポートフォリオです。公共職業訓練（ISPアカデミー川越校 / 2025年10月〜2026年1月）で制作した6作品を、次の3つの視点で説明します。
 
-> 🗣️ **ひとことで説明すると**：「利用者からの入力を受け取り、データベースに保存し、結果を画面に返す」という Web サーバーの基本の流れを、6つの作品で繰り返し作りながら身につけました。研修修了後の現在は、派遣社員としてトライアル就業中です。
+> 🗣️ **ひとことで説明すると**：「利用者からの入力を受け取り、データベースに保存し、結果を画面に返す」という Web サーバーの基本の流れを、6つの作品で繰り返し作りながら身につけました。研修修了後、人材派遣によるトライアル就業（2026/07〜09/15）を経て、現在は求職中です（2026-09-28 時点）。
 
 - **構築**：アプリや必要な部品を組み合わせ、動く環境を作る
 - **確認**：コマンドや画面で、想定どおり動くことを確かめる
@@ -11,7 +11,7 @@
 研修期間中に中心的に取り組んだのは [サーバー監視ダッシュボード](#-サーバー監視ダッシュボードpython--flask--psutil--chartjs) です。Web アプリ作品では、サーバーが入力を受け取り、データベースへ保存し、結果を返す仕組みを学びました。デスクトップ作品では、運用担当者が使う小さな業務支援ツールを Python で作りました。
 
 > [!IMPORTANT]
-> このリポジトリは学習成果の索引です。`teikei_kanri.py` と `sticky_notes.py` はこのリポジトリにコードがあります。ほかの4作品はリンク先の別リポジトリにコードがあります。実機・クラウド・本番環境での構築を、この README だけで実施済みとは扱いません。
+> このリポジトリは学習成果の索引です。`teikei_kanri.py` と `sticky_notes.py` はこのリポジトリの main にコードがあります。Pulse・掲示板・サンプル企業サイトの別リポジトリ（ns7jp/pulse・post・magic）は現在は公開していません。この3作品のコードは、このリポジトリの `pulse`・`post`・`magic` ブランチにあります。サーバー監視ダッシュボードはリンク先の別リポジトリにコードがあります。実機・クラウド・本番環境での構築を、この README だけで実施済みとは扱いません。
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white)
@@ -56,8 +56,8 @@
 | 力 | このポートフォリオでの証拠 | 現在の範囲 |
 |---|---|---|
 | Python | GUIアプリ2本、監視データ取得 | コード・解説あり |
-| Web / API | Flask、PHP、JSON API、Fetch API | 別リポジトリにコードあり |
-| データベース | SQLite / MySQL の登録・検索・更新・削除 | 別リポジトリにコードあり |
+| Web / API | Flask、PHP、JSON API、Fetch API | 別リポジトリ・別ブランチにコードあり |
+| データベース | SQLite / MySQL の登録・検索・更新・削除 | 別ブランチ（`pulse`・`post`）にコードあり |
 | 監視 | CPU・メモリ・ディスク・通信・プロセスの可視化 | ローカル監視アプリあり |
 | セキュリティ基礎 | ハッシュ化、XSS / CSRF / SQLインジェクション対策 | 実装解説あり |
 | 自動確認 | GitHub Actions による Python 構文チェック・文書リンク確認・単体テスト（`tests/`） | CI設定あり。今回の差分はローカル確認済み |
@@ -78,11 +78,11 @@
 
 | # | 作品名 | サーバー構築・運用とのつながり | 確認先 |
 |---|---|---|---|
-| ① | SNSアプリ「Pulse」 | Webサーバー、API、SQLite、認証 | [Demo](http://shimada.atwebpages.com/pulse/) / [コード](https://github.com/ns7jp/pulse) |
-| ② | 掲示板アプリ | PHP、MySQL、セッション、CRUD | [Demo](http://shimada.atwebpages.com/post/) / [コード](https://github.com/ns7jp/post) |
+| ① | SNSアプリ「Pulse」 | Webサーバー、API、SQLite、認証 | [Demo](http://shimada.atwebpages.com/pulse/) / [コード（`pulse` ブランチ）](https://github.com/ns7jp/works/tree/pulse) |
+| ② | 掲示板アプリ | PHP、MySQL、セッション、CRUD | [Demo](http://shimada.atwebpages.com/post/) / [コード（`post` ブランチ）](https://github.com/ns7jp/works/tree/post) |
 | ③ | 定型文管理アプリ | Python、ファイル操作、業務効率化 | [コード](./teikei_kanri.py) |
 | ④ | 付箋アプリ | Python、JSON、状態保存 | [コード](./sticky_notes.py) |
-| ⑤ | サンプル企業サイト | HTTP、静的配信、ブラウザ表示 | [Demo](https://ns7jp.github.io/magic/) / [コード](https://github.com/ns7jp/magic) |
+| ⑤ | サンプル企業サイト | HTTP、静的配信、ブラウザ表示 | [コード（`magic` ブランチ）](https://github.com/ns7jp/works/tree/magic)。デモ（ns7jp.github.io/magic）は現在は公開していません |
 | ⑥ | **サーバー監視ダッシュボード** | **OSメトリクス、監視、Flask API、障害の早期発見** | [コード](https://github.com/ns7jp/server-monitor) |
 
 ---
@@ -579,13 +579,13 @@ Python 標準ライブラリのみで動作します。
 
 > 🗣️ **ひとことで説明すると**：架空の企業のホームページを、HTML/CSS/JavaScriptだけで作った静的サイトです。
 
-[![View Demo](https://img.shields.io/badge/▶_View_Live_Demo-blue)](https://ns7jp.github.io/magic/)
+> デモページ（`ns7jp.github.io/magic`）と別リポジトリ `ns7jp/magic` は、現在は公開していません。
 
 サンプル企業サイトは、架空企業「MagicMoon」のコーポレートサイトです。ヨーロッパの照明・家具・空間デザインをテーマに、トップページと納入事例ページを実装しています。Web アプリではなく、HTML / CSS / JavaScript で作る静的サイトです。
 
 初学者向けに言うと、「デザインカンプを見ながら、ブラウザで表示されるページを HTML と CSS で組み立てる」作品です。文章や画像を HTML で構造化し、CSS で見た目を整え、JavaScript でメニュー開閉やスクロール演出を加えています。
 
-📄 **コード**: [ns7jp/magic](https://github.com/ns7jp/magic)
+📄 **コード**: このリポジトリの [`magic` ブランチ](https://github.com/ns7jp/works/tree/magic)
 
 ### サイト構成
 
@@ -756,7 +756,7 @@ http://localhost:5000/
 
 ## 🧗 詰まったこと・解決ログ
 
-作った機能の説明だけでなく、実際に詰まった点と直し方も記録します。原因の切り分けは、前職（製造業）での品質管理業務とも近い考え方だと感じています。
+作った機能の説明だけでなく、実際に詰まった点と直し方も記録します。この節は、2026-09-01 に AI（Claude）が作成したコミット（`c6af8f9`）で追加したものです。原因の切り分けは、前職（製造業）での品質管理業務とも近い考え方だと感じています。
 
 ### 1. 文字コードの違いでファイルが読めない（定型文管理アプリ）
 
@@ -772,9 +772,11 @@ http://localhost:5000/
 - **対処**: `psutil.cpu_percent(interval=0.5)` として、0.5秒間隔で実測してから値を返すようにした。
 - **教訓**: ライブラリの初期値・初回呼び出し時の挙動は、ドキュメントで確認してから使う。
 
-### 3. 教材コードに「避けるべき」と書いた書き方が残っていた
+### 3. 教材コードに「避けるべき」と書いた書き方が残っていた（AI（Claude）が修正した内容）
 
-- **症状**: 2026年9月、初心者向けフィードバックをもとにこのREADMEとdocsを見直していたところ、[Pythonキーワード集](./docs/python-keywords.md) で「`except Exception:` のように種類を絞る」と説明している一方、`teikei_kanri.py` と `sticky_notes.py` 本体には裸の `except:`（例外の種類を絞らない書き方）が合計13箇所残っていることに気づいた。
+> この項目は、2026-09-01 に AI（Claude）が README・docs の見直しと同時に行った修正（コミット `c6af8f9`）の内容です。
+
+- **症状**: 2026年9月の README・docs の見直しで、[Pythonキーワード集](./docs/python-keywords.md) で「`except Exception:` のように種類を絞る」と説明している一方、`teikei_kanri.py` と `sticky_notes.py` 本体には裸の `except:`（例外の種類を絞らない書き方）が合計13箇所残っていることが分かった。
 - **原因**: 教材の説明文とサンプルコードを別々に手直ししていて、互いの整合性を見落としていた。
 - **対処**: 13箇所すべてを `except Exception:` に統一し、`python -m py_compile` で構文エラーが無いことを確認した。
 - **教訓**: 「教材として読ませるコード」と「教材の説明文」は、片方だけ直すと矛盾が残る。両方をセットで確認する。
@@ -823,22 +825,29 @@ brew install python-tk
 
 **島田則幸（Noriyuki Shimada）**
 
-製造・物流の現場で「正確性」と「業務改善」を軸にキャリアを積み、ITサポート・インフラ運用支援領域へのキャリアチェンジを目指しています。学習過程では、エラーの原因を一つずつ切り分けて解決していく作業に、製造現場での品質管理と通じるものを感じています。
+製造・物流の現場で「正確性」と「業務改善」を軸にキャリアを積み、サーバーの設計・構築へのキャリアチェンジを目指しています。第一志望は Linux サーバーの設計・構築で、Windows Server / Active Directory（AD）の構築にも対応します。学習過程では、エラーの原因を一つずつ切り分けて解決していく作業に、製造現場での品質管理と通じるものを感じています。
 
-- 💼 現在：派遣社員としてITサポート・インフラ運用支援領域でトライアル就業中
+- 💼 就業状況（2026-09-28 時点）：人材派遣による IT 企業でのトライアル就業（2026/07〜）は 2026-09-15 に終了し、現在は求職中です。詳しくは[職務経歴書](https://github.com/ns7jp/ns7jp/blob/main/docs/resume.md)をご覧ください
 - 🎓 中部大学 応用生物学部 応用生物化学科 卒業（2007年）
 - 📚 ISPアカデミー川越校 公共職業訓練「情報処理」コース 修了（2026年1月）
 - 📜 取得資格
-  - Python3エンジニア認定基礎試験
-  - Python3エンジニア認定実践試験
-  - PHP8技術者認定初級試験
-  - 食品衛生管理者
+  - Python 3 エンジニア認定基礎試験（2025-12、職業訓練期間中）
+  - Python 3 エンジニア認定実践試験（2026-01、職業訓練期間中）
+  - PHP 8 技術者認定初級試験（2026-01、職業訓練期間中）
+  - ITパスポート（2026-06）
+  - 食品衛生管理者（2007-03）
+- 📝 受験予定：LinuC-1 101（受験日は未定。[資格取得ロードマップ](https://github.com/ns7jp/ns7jp/blob/main/docs/certifications/roadmap.md)）
 - 🌐 [ポートフォリオサイト](https://ns7jp.github.io/)
 - 📧 net7jp@gmail.com
 
 ### 🤖 AIツールの活用について
 
-このリポジトリのドキュメント整備（README・docsの構成見直し、誤りの修正、図解や演習の追加など）には Claude Code（AIコーディングアシスタント）を活用しています。アプリのコード自体（`teikei_kanri.py` / `sticky_notes.py`）の設計・実装は本人によるものです。AIツールを使いこなして開発・文書整備を効率化することも、実務で求められるスキルの一つと捉えています。
+このリポジトリには、AI（Claude・Codex）が作成・修正したコミットがあります。Git の履歴で確認できる主なものは次のとおりです。
+
+- 作者が `Claude` のコミット：README・docs の見直し（`c6af8f9`、`2a3da86`、`118e41d`）、`teikei_kanri.py` と `sticky_notes.py` の裸の `except:` 13箇所の修正（`c6af8f9`）、`teikei_kanri.py` の import 時の副作用の修正と単体テストの追加（`7dbf2b5`）、`sticky_notes.py` の単体テストの追加（`bf073d5`）、Pulse・掲示板のコードの移動（`faa5e0e`、`09cb8eb`、`e56b11a`）
+- `codex/` で始まるブランチからのマージ：このリポジトリの PR #1（README・docs・CI・`scripts/check_docs.py` の追加など）と PR #2（キーワード集の追加）、`pulse`・`post`・`magic` ブランチに残る各作品の元リポジトリの PR #1（コード・README・構築手順などの変更）
+
+ポートフォリオ全体で AI 支援がどこまで及んでいるかは、[職務経歴書 §4-b「ポートフォリオにおける AI 支援の範囲」](https://github.com/ns7jp/ns7jp/blob/main/docs/resume.md#4-b-ポートフォリオにおける-ai-支援の範囲)にまとめています。
 
 ---
 
