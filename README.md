@@ -1,6 +1,18 @@
-# Works — サーバー構築エンジニアを目指すポートフォリオ
+# 職業訓練の制作物｜Python・Webアプリ
 
-Web・Pythonの学習で扱った6作品の索引です。インフラ構築・運用の学習記録は、主作品 **[server](https://github.com/ns7jp/server)** にまとめています。
+<a id="works--サーバー構築エンジニアを目指すポートフォリオ"></a>
+
+職業訓練で学んだPythonやPHPの制作物を中心に、6作品を紹介しています。ヘルプデスクで使う文面を扱う例として、Pythonの定型文管理アプリを紹介します。Webアプリで画面とデータベースがどうつながるかは、PHPとMySQLの掲示板で確認できます。公開コードの修正、テストや解説の作成にはAIの支援を受けています。
+
+## 代表的な2作品
+
+### 問い合わせの初回確認文を保存して使う（Python・Flet）
+
+定型文管理アプリでは「PC不調の初回確認」などの名前で文章を保存し、一覧から選んで返信にコピーできます。ファイルを読む処理には、UTF-8やWindowsで使われるCP932の日本語を読み込めるかを確認する単体テストがあります。[操作画面](docs/teikei_kanri.png) ／ [入力から貼り付けまでの確認手順](docs/demo-flow.md#定型文管理アプリ) ／ [Pythonコード](teikei_kanri.py) ／ [読み込みのテスト](tests/test_teikei_kanri.py)
+
+### 投稿者名を付けて掲示板に表示する（PHP・MySQL）
+
+会員と投稿を別々のテーブルに保存し、投稿に記録した会員IDで結び付けます。PHPが投稿本文と投稿者名を取り出し、新しい投稿から順に画面に並べる流れを追えます。[会員と投稿のテーブル定義](https://github.com/ns7jp/works/blob/post/database/schema.sql) ／ [投稿一覧を表示するコード](https://github.com/ns7jp/works/blob/post/index.php)
 
 ## 📂 作品一覧
 
@@ -9,16 +21,11 @@ Web・Pythonの学習で扱った6作品の索引です。インフラ構築・�
 | SNSアプリ「Pulse」 | PHP・SQLite・認証・投稿 | [`pulse` ブランチ](https://github.com/ns7jp/works/tree/pulse) |
 | 掲示板アプリ | PHP・MySQL・セッション・投稿と返信 | [`post` ブランチ](https://github.com/ns7jp/works/tree/post) |
 | 定型文管理アプリ | Python / Flet・文字列とファイルの管理 | [mainのコード](teikei_kanri.py) |
-| 付箋アプリ | Python / Tkinter・JSONによる状態保存 | [mainのコード](sticky_notes.py) |
+| 付箋アプリ | Python / Tkinter・JSONによる状態保存 | [mainのコード](sticky_notes.py) ／ [画面](docs/sticky_notes.png) |
 | サンプル企業サイト | HTML・CSS・JavaScriptによる画面構成 | [`magic` ブランチ](https://github.com/ns7jp/works/tree/magic) |
 | サーバー監視ダッシュボード | Flask API・OS情報の取得・グラフ表示 | [主作品 `server`](https://github.com/ns7jp/server) |
 
 Pulse・掲示板・企業サイトの旧独立リポジトリは非公開です。企業サイトの旧デモも公開していません。上のブランチからコードを確認できます。
-
-## 代表的な2作品
-
-- **定型文管理**：文章の保存・編集・コピーを行うデスクトップアプリです。[画面](docs/teikei_kanri.png)と[処理・実行方法](docs/project-reference.md#-定型文管理アプリpython--flet)を確認できます。
-- **付箋**：複数のメモを作り、内容や位置をJSONに保存するアプリです。[画面](docs/sticky_notes.png)と[処理・実行方法](docs/project-reference.md#-付箋アプリpython--tkinter)を確認できます。
 
 ## 確認記録とAI支援
 
